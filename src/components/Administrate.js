@@ -17,17 +17,9 @@ class Administrate extends Component{
         super(props)
 
         this.state = {
-            email: "",
-            password: "",
-            emailError: "",
-            passwordError: "",
-            genericErrorMessage: "*required"
 
         }
 
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.errors = this.errors.bind(this);
     }
     render(){
         return (

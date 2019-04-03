@@ -45,6 +45,7 @@ class IndexReport extends Component{
 
     processReport(event){
 
+        this.handleInputChange(event);
         this.fetchReport(event.target.value);
     }
 
@@ -57,10 +58,10 @@ class IndexReport extends Component{
                         name="URL"
                         type="URL"
                         value={this.state.URL}
-                        onChange={()=>{this.handleInputChange(); this.processReport();}} />
+                        onChange={this.processReport} />
                     {!!this.state.URLError && (<p style={{color: 'red', float: "right"}}>{this.state.URLError}</p>)}
                 </label>
-                <p></p>
+                <p>{this.state.reportTitle}</p>
                 <br />
                 <label>
                     Password:
@@ -97,9 +98,21 @@ class IndexReport extends Component{
     }
 
     fetchReport(URL){
-        fetch(URL)
+
+        fetch(URL + ".json", {
+            credentials: 'include',
+            method: 'GET',
+            dataType: 'json',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials':true,
+                'Access-Control-Allow-Methods':'POST, GET'
+            }
+        })
             .then(response => response.json())
-            .then(data => this.setState({ reportTitle: data, URL: URL }, console.log(data)));
+            .then(data => this.setState({ reportTitle: data.title, URL: URL }, console.log(data)));
     }
 
     /**
