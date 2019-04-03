@@ -1,12 +1,11 @@
 import React, {Component} from "react";
 import {server} from '../config';
 import { withRouter } from 'react-router-dom'
-import AddTerm from "./AddTerm";
 
 /**
  * Presents the user with input fields for registration of new user. Given values are posted to the server using fetch.
  */
-class IndexReport extends Component{
+class AddTerm extends Component{
 
     componentDidUpdate(){
 
@@ -18,17 +17,15 @@ class IndexReport extends Component{
         this.state = {
             email: "",
             password: "",
-            URLError: "",
+            emailError: "",
             passwordError: "",
-            genericErrorMessage: "*required",
-            reportTitle: "",
+            genericErrorMessage: "*required"
 
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.errors = this.errors.bind(this);
-        this.processReport = this.processReport.bind(this);
     }
 
     handleInputChange(event) {
@@ -42,23 +39,18 @@ class IndexReport extends Component{
         });
     }
 
-    processReport(event){
-        this.setState({reportTitle: event.target.value});
-    }
-
     render(){
         return (
             <form onSubmit={this.handleSubmit}>
                 <label>
-                    Report URL:
+                    Email:
                     <input
-                        name="URL"
-                        type="URL"
-                        value={this.state.URL}
-                        onChange={()=>{this.handleInputChange(); this.processReport();}} />
-                    {!!this.state.URLError && (<p style={{color: 'red', float: "right"}}>{this.state.URLError}</p>)}
+                        name="email"
+                        type="email"
+                        value={this.state.email}
+                        onChange={this.handleInputChange} />
+                    {!!this.state.emailError && (<p style={{color: 'red', float: "right"}}>{this.state.emailError}</p>)}
                 </label>
-                <p></p>
                 <br />
                 <label>
                     Password:
@@ -132,4 +124,4 @@ class IndexReport extends Component{
     }
 }
 
-export default  withRouter(IndexReport);
+export default  withRouter(AddTerm);

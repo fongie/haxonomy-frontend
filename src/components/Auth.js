@@ -9,6 +9,7 @@ import Register from '../pages/Register';
 import Header from "./Header";
 import Footer from "./Footer";
 import Home from '../pages/Home';
+import Haxonomy from './Haxonomy';
 
 
 /**
@@ -26,6 +27,7 @@ function Auth() {
                 <Route path="/home" component={Home}/>
                 <Route path="/register" component={Register}/>
                 <Route path="/login" component={Login}/>
+                <Route path="/haxonomy" component={Haxonomy}/>
                 <Footer/>
             </div>
         </Router>

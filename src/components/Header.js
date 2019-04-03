@@ -29,6 +29,11 @@ class Header extends Component {
                             <Link to ='/register' >register</Link>
                         </Navbar.Brand>
                     </Nav>
+                    <Nav>
+                        <Navbar.Brand>
+                            <Link to ='/haxonomy' >haxonomy</Link>
+                        </Navbar.Brand>
+                    </Nav>
                     <Navbar.Brand>
                     <ul className="nav navbar-nav navbar-right">
                     <AuthButton/>
