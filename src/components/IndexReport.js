@@ -16,7 +16,7 @@ class IndexReport extends Component{
         super(props)
 
         this.state = {
-            email: "",
+            URL: "",
             password: "",
             URLError: "",
             passwordError: "",
@@ -28,6 +28,7 @@ class IndexReport extends Component{
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.errors = this.errors.bind(this);
+        this.fetchReport = this.fetchReport.bind(this);
         this.processReport = this.processReport.bind(this);
     }
 
@@ -43,7 +44,8 @@ class IndexReport extends Component{
     }
 
     processReport(event){
-        this.setState({reportTitle: event.target.value});
+
+        this.fetchReport(event.target.value);
     }
 
     render(){
@@ -92,6 +94,12 @@ class IndexReport extends Component{
         }
         return error;
 
+    }
+
+    fetchReport(URL){
+        fetch(URL)
+            .then(response => response.json())
+            .then(data => this.setState({ reportTitle: data, URL: URL }, console.log(data)));
     }
 
     /**
