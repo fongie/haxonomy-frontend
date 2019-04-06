@@ -1,8 +1,7 @@
 import React from "react";
 import {
     BrowserRouter as Router,
-    Route,
-    Redirect,
+    Route, Redirect
 } from "react-router-dom";
 import Login from '../pages/Login';
 import Register from '../pages/Register';
