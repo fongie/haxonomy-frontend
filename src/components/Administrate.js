@@ -21,6 +21,7 @@ class Administrate extends Component{
         }
 
     }
+
     render(){
         return (
             <div>

@@ -42,7 +42,7 @@ class AddTerm extends Component{
 
 
     fetchTerms(){
-        fetch(server + "/terms?limit=24",
+        fetch(server + "/terms?size=100000&sort=name",
             {credentials: 'include'}
         )
             .then(res => res.json())
@@ -57,7 +57,6 @@ class AddTerm extends Component{
 
     arrangeTerms(rawTerms){
         let terms = [];
-        console.log(rawTerms)
         rawTerms._embedded.terms.forEach((term) =>
             terms.push({
                 "name": term.name,
@@ -65,7 +64,7 @@ class AddTerm extends Component{
                 "href": term._links.self.href,
             })
         );
-        this.setState({terms: terms}, console.log(this.state.terms))
+        this.setState({terms: terms})
     }
 
     handleInputChange(event) {
@@ -86,7 +85,7 @@ class AddTerm extends Component{
             if (term.name === event.target.value)
                 term.isChecked =  event.target.checked
         })
-        this.setState({terms: terms}, console.log(terms))
+        this.setState({terms: terms})
     }
 
     processURL(event){
@@ -98,7 +97,7 @@ class AddTerm extends Component{
     selectTerms() {
         if(this.state.terms !== null){
             return <div id={"selectTermDiv"}>
-                <p id={"formText"}>select parent below:</p>
+                <p id={"formText"}>select broader term below:</p>
                 { this.state.terms.map((term) =>
                     <ul id={"checkboxUl"} key={term.name}>
                         <label id={"labelBox"}>
@@ -165,13 +164,13 @@ class AddTerm extends Component{
             method: 'GET',
         })
             .then(response => response.json())
-            .then(data => this.setState({ reportTitle: data.title, termTitle: URL }, console.log("hej")));
+            .then(data => this.setState({ reportTitle: data.title, termTitle: URL }));
     }
 
     getSelectedParent() {
         let selectedParent = "";
         this.state.terms.forEach((term) =>
-            term.isChecked ? selectedParent = term.href : null
+            term.isChecked ? selectedParent = term : null
         );
         return selectedParent;
     }
@@ -181,12 +180,15 @@ class AddTerm extends Component{
      * @param event
      */
     handleSubmitTerm() {
+        let selectedParent = this.getSelectedParent();
+        if (!window.confirm("Term name is: \"" + this.state.termTitle + "\" \nSelected parent is: \"" + selectedParent.name + "\".\n\n\t\t\tOK?"))
+            return;
         if(this.errors())
             return;
         const jsonRequest =
             {
                 "name": this.state.termTitle,
-                "broaderTerm": this.getSelectedParent(),
+                "broaderTerm": selectedParent.href,
 
             }
         fetch(server + '/terms', {
@@ -200,7 +202,6 @@ class AddTerm extends Component{
         }).then((response) => {
             return response.json();
         }).then((response) => {
-            console.log(response)
             if ((response.error) && response.status === 409) {throw new Error("The report already exists, please try another.")}
             if(response.error) throw new Error("Something went wrong, please try again in a few minutes");
             else return response;

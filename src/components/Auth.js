@@ -24,10 +24,10 @@ function Auth() {
         <Router>
             <div>
                 <Header />
-                <PrivateRoute path="/home" component={Home}/>
+                <Route path="/home" component={Home}/>
                 <Route path="/register" component={Register}/>
                 <Route path="/login" component={Login}/>
-                <Route path="/administrate" component={Administrate}/>
+                <PrivateRoute path="/administrate" component={Administrate}/>
                 <Route path="/haxonomy" component={Haxonomy}/>
                 <Footer/>
             </div>
