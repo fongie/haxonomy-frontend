@@ -1,8 +1,7 @@
 import React from "react";
 import {
     BrowserRouter as Router,
-    Route,
-    Redirect,
+    Route, Redirect
 } from "react-router-dom";
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -28,7 +27,7 @@ function Auth() {
                 <Route path="/home" component={Home}/>
                 <Route path="/register" component={Register}/>
                 <Route path="/login" component={Login}/>
-                <Route path="/administrate" component={Administrate}/>
+                <PrivateRoute path="/administrate" component={Administrate}/>
                 <Route path="/haxonomy" component={Haxonomy}/>
                 <Footer/>
             </div>
