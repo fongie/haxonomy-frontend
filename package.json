@@ -23,7 +23,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "https://iv1201-recruit-server.herokuapp.com",
+  "proxy": "https://haxonomy-backend.herokuapp.com",
   "browserslist": [
     ">0.2%",
     "not dead",

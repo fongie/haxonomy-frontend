@@ -102,19 +102,19 @@ class Haxonomy extends Component {
      * <Tree data={this.state.data} />
      */
     fetchTerms = () => {
-        fetch(server + "/terms?=1000",
+        fetch(server + "/tree",
             {credentials: 'include'}
         )
+            .then(res => console.log(res))
             .then(res => res.json())
             .then((response) =>
             {
                 if (response.error) throw new Error("Something went wrong. Please reload the page.");
                 else return response;
             })
-            .then(data => this.setState({data: data.name}))
+            .then(data => this.setState({data: data}))
+            .then(console.log(this.state.data))
             .catch(e => { alert(e.message);})
-
-
     }
 
     /**
@@ -123,7 +123,6 @@ class Haxonomy extends Component {
      * @param evt is an event object that we don't use at the moment
      */
     handleClick = (nodeData, evt) => {
-        console.log(nodeData);
         this.setState({ modalShow: true, nodeData: nodeData})
     }
 
@@ -136,8 +135,8 @@ class Haxonomy extends Component {
                         <VerticallyCenteredModal
                             show={this.state.modalShow}
                             onHide={modalClose}
+                            nodeData={this.state.nodeData}
                         />
-
 
                     <Tree styles={customStyles} data={myTreeData} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
                 </div>

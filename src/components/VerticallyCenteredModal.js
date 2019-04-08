@@ -24,7 +24,7 @@ export default class VerticallyCenteredModal extends React.Component {
 
     render() {
         return (
-            <Modal
+        <Modal
                 {...this.props}
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
@@ -32,12 +32,15 @@ export default class VerticallyCenteredModal extends React.Component {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Modal heading
+                        Matching Reports
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <h4>Centered Modal</h4>
+
+
                     <p>
+                        {this.props.nodeData != null ? this.props.nodeData.name.toString() : null}
                         Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
                         dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
                         ac consectetur ac, vestibulum at eros.
