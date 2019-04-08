@@ -1,46 +1,146 @@
 import React, {Component} from "react";
 import {server} from '../config';
 import { withRouter } from 'react-router-dom';
-import Tree from 'react-tree-graph';
+import './Haxonomy.css';
+import Tree from 'react-d3-tree';
+import VerticallyCenteredModal from './VerticallyCenteredModal';
 
-/**
- * Presents the user with input fields for registration of new user. Given values are posted to the server using fetch.
- */
-class Haxonomy extends Component{
+
+const myTreeData = [
+    {
+        name: 'Top Level',
+        attributes: {
+            keyA: 'val A',
+            keyB: 'val B',
+            keyC: 'val C',
+        },
+        children: [
+            {
+                name: 'Level 2: A',
+                attributes: {
+                    keyA: 'val A',
+                    keyB: 'val B',
+                    keyC: 'val C',
+                },
+            },
+            {
+                name: 'Level 2: B',
+                children: [
+                    {
+                        name: 'Level 3: A',
+                        attributes: {
+                            keyA: 'val A',
+                            keyB: 'val B',
+                            keyC: 'val C',
+                        },
+                    },
+                    {
+                        name: 'Level 3: B',
+                    },
+                ],
+            },
+        ],
+    },
+];
+
+const svgSquare = {
+    shape: 'rect',
+    shapeProps: {
+        width: 100,
+        height: 20,
+        x: 0,
+        y: -10,
+    }
+}
+
+const textLayout = {
+    textAnchor: "start",
+    x: 5,
+    y: 0,
+    transform: undefined
+}
+
+const customStyles = {
+    links: {},
+    nodes: {
+        node: {
+            rect: {},
+            name: {},
+            attributes: {},
+        },
+        leafNode: {
+            rect: {},
+            name: {},
+            attributes: {},
+        },
+    },
+}
+
+
+
+
+class Haxonomy extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            data: ""
+            modalShow: false,
+            data: undefined,
+            nodeData: undefined
         };
 
-        this.loadGraphData();
     }
 
-    loadGraphData = () => {
-        this.data = {
-            name: 'Parent',
-            children: [{
-                name: 'Child One'
-            }, {
-                name: 'Child Two'
-            }]
-        };
-    };
+    componentDidMount() {
+        this.fetchTerms()
+    }
+
+    /**
+     * GET all terms from server
+     * https://haxonomy-backend.herokuapp.com/terms?=1000
+     * <Tree data={this.state.data} />
+     */
+    fetchTerms = () => {
+        fetch(server + "/tree",
+            {credentials: 'include'}
+        )
+            .then(res => console.log(res))
+            .then(res => res.json())
+            .then((response) =>
+            {
+                if (response.error) throw new Error("Something went wrong. Please reload the page.");
+                else return response;
+            })
+            .then(data => this.setState({data: data}))
+            .then(console.log(this.state.data))
+            .catch(e => { alert(e.message);})
+    }
+
+    /**
+     * Handles clicks on nodes, updates node data state and show modal
+     * @param nodeData is the node data received from node onClick
+     * @param evt is an event object that we don't use at the moment
+     */
+    handleClick = (nodeData, evt) => {
+        this.setState({ modalShow: true, nodeData: nodeData})
+    }
 
     render() {
+        let modalClose = () => this.setState({ modalShow: false });
+
         return (
-            <div>
-                {console.log(this.data)}
-                <Tree
-                    data={this.data}
-                    height={400}
-                    width={400}/>
-            </div>
-        )
+                <div id="treeWrapper" style={{marginLeft: '5em', width: '100em', height: '50em'}}>
+
+                        <VerticallyCenteredModal
+                            show={this.state.modalShow}
+                            onHide={modalClose}
+                            nodeData={this.state.nodeData}
+                        />
+
+                    <Tree styles={customStyles} data={myTreeData} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
+                </div>
+        );
     }
-
 }
-
 export default withRouter(Haxonomy);
