@@ -102,19 +102,20 @@ class Haxonomy extends Component {
      * <Tree data={this.state.data} />
      */
     fetchTerms = () => {
+        console.log("Server is " + server);
         fetch(server + "/tree",
             {credentials: 'include'}
         )
-            .then(res => console.log(res))
             .then(res => res.json())
             .then((response) =>
             {
                 if (response.error) throw new Error("Something went wrong. Please reload the page.");
                 else return response;
             })
-            .then(data => this.setState({data: data}))
-            .then(console.log(this.state.data))
+            .then(res => {this.setState({data: res})
+            })
             .catch(e => { alert(e.message);})
+
     }
 
     /**
@@ -129,6 +130,9 @@ class Haxonomy extends Component {
     render() {
         let modalClose = () => this.setState({ modalShow: false });
 
+        if (!this.state.data) {
+            return <p>LOADING..</p>
+        } else {
         return (
                 <div id="treeWrapper" style={{marginLeft: '5em', width: '100em', height: '50em'}}>
 
@@ -138,9 +142,10 @@ class Haxonomy extends Component {
                             nodeData={this.state.nodeData}
                         />
 
-                    <Tree styles={customStyles} data={myTreeData} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
+                    <Tree styles={customStyles} data={this.state.data} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
                 </div>
         );
+        }
     }
 }
 export default withRouter(Haxonomy);
