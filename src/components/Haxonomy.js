@@ -744,7 +744,7 @@ class Haxonomy extends Component {
                             nodeData={this.state.nodeData}
                         />
 
-                    <Tree styles={customStyles} data={this.state.data != null ? this.state.data : null} orientation={'horizontal'} zoom={0.6} separation={separation} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
+                    <Tree styles={customStyles} data={this.state.data} orientation={'horizontal'} zoom={0.6} separation={separation} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
                 </div>
         );
     }
