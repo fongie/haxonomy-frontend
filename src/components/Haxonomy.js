@@ -664,6 +664,11 @@ const separation = {
     nonSiblings: 0.5
 }
 
+const nodeSize = {
+    x: 240,
+    y: 140
+}
+
 
 
 
@@ -730,7 +735,7 @@ class Haxonomy extends Component {
                             nodeData={this.state.nodeData}
                         />
 
-                    <Tree styles={customStyles} data={this.state.data} orientation={'horizontal'} zoom={0.6} separation={separation} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
+                    <Tree styles={customStyles} pathFunc={"diagonal"} nodeSize={nodeSize} data={this.state.data} orientation={'horizontal'} zoom={0.6} separation={separation} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
 
                 </div>
         );
