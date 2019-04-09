@@ -697,16 +697,6 @@ class Haxonomy extends Component {
             {credentials: 'include'}
         )
             .then(res => res.json())
-            .then((response) =>
-            {
-                credentials: 'include',
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then(res => res.json())
             .then((response) => {
                 if (response.error) throw new Error("Something went wrong. Please reload the page.");
                 else return response;
@@ -715,17 +705,6 @@ class Haxonomy extends Component {
             })
             .catch(e => { alert(e.message);})
     }
-/*
-.then(data => {
-    let l = this.state.data;
-    l.push(data);
-    this.setState({data: l})
-
-
-
-                .then(res => console.log(res))
-
-})*/
 
     /**
      * Handles clicks on nodes, updates node data state and show modal
