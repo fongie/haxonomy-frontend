@@ -1,0 +1,21 @@
+#selectTermDiv{
+    width: 90em;
+    margin: auto;
+}
+#checkboxUl{
+    width: 30em;
+    display: inline;
+}
+
+#labelBox{
+    width: 20em;
+    text-align: left;
+    font-weight: normal;
+
+}
+
+#formText{
+    font-weight: bold;
+    font-size: 1em;
+}
+

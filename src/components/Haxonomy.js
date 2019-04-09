@@ -690,8 +690,14 @@ class Haxonomy extends Component {
      * https://haxonomy-backend.herokuapp.com/terms?=1000
      * <Tree data={this.state.data} />
      */
-    fetchTerms() {
+
+    fetchTerms = () => {
+        console.log("Server is " + server);
         fetch(server + "/tree",
+            {credentials: 'include'}
+        )
+            .then(res => res.json())
+            .then((response) =>
             {
                 credentials: 'include',
                 method: 'GET',
@@ -705,11 +711,9 @@ class Haxonomy extends Component {
                 if (response.error) throw new Error("Something went wrong. Please reload the page.");
                 else return response;
             })
-            .then(data => this.setState({data: data}))
-            .then(() => console.log("THIS STATE DATA " + this.state.data))
-            .catch(e => {
-                alert(e.message);
+            .then(res => {this.setState({data: res})
             })
+            .catch(e => { alert(e.message);})
     }
 /*
 .then(data => {
@@ -735,6 +739,9 @@ class Haxonomy extends Component {
     render() {
         let modalClose = () => this.setState({ modalShow: false });
 
+        if (!this.state.data) {
+            return <p>LOADING..</p>
+        } else {
         return (
                 <div id="treeWrapper" style={{marginLeft: '5em', width: '100em', height: '50em'}}>
 
@@ -745,8 +752,10 @@ class Haxonomy extends Component {
                         />
 
                     <Tree styles={customStyles} data={this.state.data} orientation={'horizontal'} zoom={0.6} separation={separation} nodeSvgShape={svgSquare} textLayout={textLayout} collapsible={false} onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}/>
+
                 </div>
         );
+        }
     }
 }
 export default withRouter(Haxonomy);

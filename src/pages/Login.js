@@ -67,14 +67,13 @@ class Login extends Component{
             body: data,
         })
             .then((response) => {
-                console.log(response)
                 if(!response.ok && response.status === 401) throw new Error("Wrong username or password");
                 else if(!response.ok) throw new Error("Oops! Something went wrong. Please try again in a few minutes.");
                 else return response.json();
             })
             .then((data) => {
                 auth.authenticate(() => {
-                    data.roles[0].name === "applicant" ?
+                    data.role[0].name === "taxonomist" ?
                     this.setState({ redirectToReferrer: true }, ()=>{auth.user = data.username; this.props.history.replace('/application')})
                 :
                     alert("You are not authorized to use this web site. \n Required authority: applicant \n Your authority: " + data.roles[0].name);
