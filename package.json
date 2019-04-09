@@ -5,14 +5,12 @@
   "dependencies": {
     "bootstrap": "^4.3.1",
     "cors": "^2.8.5",
-    "d3": "^5.9.2",
     "react": "^16.7.0",
     "react-bootstrap": "^0.32.4",
     "react-d3-tree": "^1.12.3",
     "react-dom": "^16.7.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "^2.1.8",
-    "react-tree-graph": "^4.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
