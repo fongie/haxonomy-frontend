@@ -16,7 +16,9 @@ const VerticallyCenteredModal = (props) => {
                     </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <h4>Centered Modal</h4>
+                        <h4>
+                            {props.nodeData != null ? props.nodeData.name : 'Links'}
+                        </h4>
                         {
                             props.reports != null
                                 ?
