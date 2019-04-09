@@ -623,12 +623,12 @@ const maxData2 = [{
 const svgSquare = {
     shape: 'rect',
     shapeProps: {
-        width: 160,
-        height: 20,
+        width: 190,
+        height: 22,
         x: 0,
-        y: -10,
+        y: -11,
         rx: 5,
-        ry: 5
+        ry: 5,
     }
 }
 
@@ -640,20 +640,34 @@ const textLayout = {
     textAnchor: "start",
     x: 5,
     y: 0,
-    transform: undefined
+    transform: undefined,
 }
 
 const customStyles = {
-    links: {},
+    links: {
+        stroke: 'silver'
+    },
     nodes: {
         node: {
-            rect: {},
-            name: {},
+            circle: {
+                fill: '#fc968a',
+                stroke: '#c66257'
+            },
+            name: {
+                stroke: '#4f2520',
+                fill: '#4f2520'
+            },
             attributes: {},
         },
         leafNode: {
-            rect: {},
-            name: {},
+            circle: {
+                fill: '#fff',
+                stroke: '#999'
+            },
+            name: {
+                stroke: '#424242',
+                fill: '#424242'
+            },
             attributes: {},
         },
     },
@@ -665,7 +679,7 @@ const separation = {
 }
 
 const nodeSize = {
-    x: 240,
+    x: 250,
     y: 140
 }
 
