@@ -4,6 +4,7 @@ import {
 } from "react-router-dom";
 import {auth} from '../components/Auth';
 import {server} from '../config';
+import './Pages.css'
 
 /**
  * Presents the user with a log in form taking username and password. The given values is then posted to the server as a
@@ -105,7 +106,7 @@ class Login extends Component{
         }
 
         return(
-            <div>
+            <div className="haxonomyPageContainer">
                 <form onSubmit={this.login}>
                     <label>
                         Username:

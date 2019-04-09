@@ -10,6 +10,60 @@ h2{
     position: relative;
 }
 
+/**
+Navbar color
+ */
 .navbar {
     margin-bottom: 0;
+    background: #30363d;
+}
+/**
+Navbar text color
+ */
+.navbar-default .navbar-brand {
+    color: #bbc2c9;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    margin: 0.6em 0.8em;
+    border-radius: 0.5em;
+}
+/**
+Active Navbar item
+ */
+.navbar-default .navbar-brand:focus {
+    color: white;
+    background-color: #232a30;
+}
+.navbar-default .navbar-brand:focus :hover{
+    color: white;
+    background-color: #232a30;
+}
+/**
+Hover Navbar item
+ */
+.navbar-default .navbar-brand:hover {
+    color: white;
+}
+
+/**
+Login button
+ */
+#headerButton {
+    background: #47c5ef;
+    border-radius: 0.2em;
+    border: none;
+    color: #30363d;
+    font-size: small;
+    padding: 0.5em 1em;
+}
+
+#headerButton button:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+/**
+Fix position of login button
+ */
+.navbar-right {
+    margin: 0.3em !important;
 }

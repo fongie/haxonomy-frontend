@@ -17,7 +17,7 @@ class Header extends Component {
     render() {
         return (
             <div>
-                <Navbar bg="dark" variant="dark">
+                <Navbar bg="primary" variant="dark">
                     <Navbar.Header>
                         <Navbar.Brand>
                             <Link to ='/home' >home</Link>
