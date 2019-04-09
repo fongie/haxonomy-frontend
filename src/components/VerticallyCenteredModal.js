@@ -1,55 +1,67 @@
 import React from "react";
 import { Modal, Button } from 'react-bootstrap';
 
-export default class VerticallyCenteredModal extends React.Component {
-
-    constructor(props, context) {
-        super(props, context);
-
-        this.handleShow = this.handleShow.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-
-        this.state = {
-            show: false,
-        };
-    }
-
-    handleClose() {
-        this.setState({ show: false });
-    }
-
-    handleShow() {
-        this.setState({ show: true });
-    }
-
-    render() {
+const VerticallyCenteredModal = (props) => {
         return (
-        <Modal
-                {...this.props}
-                size="lg"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>
+                <Modal
+                    show = {props.show}
+                    onHide = {props.onHide}
+                    size="lg"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered
+                >
+                    <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
                         Matching Reports
                     </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <h4>Centered Modal</h4>
-
-
-                    <p>
-                        {this.props.nodeData != null ? this.props.nodeData.name.toString() : null}
-                        Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-                        dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-                        ac consectetur ac, vestibulum at eros.
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.props.onHide}>Close</Button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h4>Centered Modal</h4>
+                        {
+                            props.reports != null
+                                ?
+                                reportLinks(props.reports)
+                                :
+                                <p>Loading..</p>
+                        }
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <Button onClick={props.onHide}>Close</Button>
+                    </Modal.Footer>
+                </Modal>
+            );
 }
+
+const reportLinks = (reports) => {
+    return (
+            <div>
+                {
+                    reports.length < 1
+                        ?
+                        <p>There are no reports in this category</p>
+                        :
+                        reports.map(
+                            (report) =>
+                                <LinkToReport
+                                    title = {report.title}
+                                    url = {report.url}
+                                />
+                        )
+                }
+            </div>
+           );
+}
+
+const LinkToReport = (props) => (
+        <div>
+            <a
+                href ={props.url}
+                target = "_blank"
+                rel="noopener noreferrer"
+            >
+                {props.title}
+            </a>
+        </div>
+        );
+
+export default VerticallyCenteredModal;

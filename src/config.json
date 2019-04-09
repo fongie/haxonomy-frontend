@@ -1,4 +1,7 @@
 {
-  "server" : "https://haxonomy-backend.herokuapp.com"
+  "server" : "https://haxonomy-backend.herokuapp.com",
+  "terms" : "/terms",
+  "reports": "/reports",
+  "tree": "/tree"
 }
 
