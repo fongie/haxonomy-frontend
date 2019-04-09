@@ -25,17 +25,7 @@ class Header extends Component {
                     </Navbar.Header>
                     <Nav>
                         <Navbar.Brand>
-                            <Link to ='/register' >register</Link>
-                        </Navbar.Brand>
-                    </Nav>
-                    <Nav>
-                        <Navbar.Brand>
                             <Link to ='/haxonomy' >haxonomy</Link>
-                        </Navbar.Brand>
-                    </Nav>
-                    <Nav>
-                        <Navbar.Brand>
-                            <Link to ='/administrate' >administrate</Link>
                         </Navbar.Brand>
                     </Nav>
                     <Navbar.Brand>

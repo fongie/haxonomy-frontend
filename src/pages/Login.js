@@ -128,7 +128,7 @@ class Login extends Component{
                         {!!this.state.passwordError && (<p style={{color: 'red', float: "right"}}>{this.state.passwordError}</p>)}
                     </label>
                     <br/>
-                    <input type="submit" value="Submit" />
+                    <input type="submit" value="Login" />
                 </form>
                 <br/>
                 <button onClick={()=>this.props.history.replace('/register')}>Register</button>
