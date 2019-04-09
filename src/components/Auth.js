@@ -29,7 +29,9 @@ function Auth() {
                 <Route path="/login" component={Login}/>
                 <PrivateRoute path="/administrate" component={Administrate}/>
                 <Route path="/haxonomy" component={Haxonomy}/>
+{/*
                 <Footer/>
+*/}
             </div>
         </Router>
     )
