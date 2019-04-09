@@ -16,9 +16,8 @@ class Header extends Component {
     }
     render() {
         return (
-            <PageHeader>
-                HAXONOMY
-                <Navbar>
+            <div>
+                <Navbar bg="dark" variant="dark">
                     <Navbar.Header>
                         <Navbar.Brand>
                             <Link to ='/home' >home</Link>
@@ -45,8 +44,10 @@ class Header extends Component {
                     </ul>
                     </Navbar.Brand>
                 </Navbar>
+{/*
                 {this.props.location.pathname.substring(1)}
-            </PageHeader>
+*/}
+            </div>
         );
     }
 }

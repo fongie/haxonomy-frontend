@@ -9,3 +9,7 @@ h2{
     font-stretch:ultra-expanded;
     position: relative;
 }
+
+.navbar {
+    margin-bottom: 0;
+}
