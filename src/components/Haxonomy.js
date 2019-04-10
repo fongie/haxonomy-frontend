@@ -144,7 +144,7 @@ class Haxonomy extends Component {
             return <p>LOADING..</p>
         } else {
         return (
-                <div id="treeWrapper" style={{marginLeft: '5em', width: '100em', height: '100em'}}>
+                <div id="treeWrapper" className="haxContainer">
 
                         <VerticallyCenteredModal
                             show={this.state.modalShow}

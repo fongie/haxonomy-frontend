@@ -2,36 +2,36 @@ import React from "react";
 import { Modal, Button } from 'react-bootstrap';
 
 const VerticallyCenteredModal = (props) => {
-        return (
-                <Modal
-                    show = {props.show}
-                    onHide = {props.onHide}
-                    size="lg"
-                    aria-labelledby="contained-modal-title-vcenter"
-                    centered
-                >
-                    <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">
-                        Matching Reports
-                    </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <h4>
-                            {props.nodeData != null ? props.nodeData.name : 'Links'}
-                        </h4>
-                        {
-                            props.reports != null
-                                ?
-                                reportLinks(props.reports)
-                                :
-                                <p>Loading..</p>
-                        }
-                    </Modal.Body>
-                    <Modal.Footer>
-                    <Button onClick={props.onHide}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
-            );
+    return (
+        <Modal
+            show={props.show}
+            onHide={props.onHide}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+        >
+            <Modal.Header closeButton>
+                <Modal.Title id="contained-modal-title-vcenter">
+                    Matching Reports
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <h4>
+                    {props.nodeData != null ? props.nodeData.name : 'Links'}
+                </h4>
+                {
+                    props.reports != null
+                        ?
+                        reportLinks(props.reports)
+                        :
+                        <p>Loading..</p>
+                }
+            </Modal.Body>
+            <Modal.Footer>
+                <Button onClick={props.onHide}>Close</Button>
+            </Modal.Footer>
+        </Modal>
+    );
 }
 
 const reportLinks = (reports) => {
