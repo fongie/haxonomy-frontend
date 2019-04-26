@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
 import {withRouter, Link} from 'react-router-dom';
 import {auth} from '../components/Auth';
-import Navbar from 'react-bootstrap/Navbar'
-import Nav from 'react-bootstrap/Nav'
-import Button from 'react-bootstrap/Button'
-/*
 import './Header.css';
-*/
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
+import Button from 'react-bootstrap/Button';
 
 /**
  * Presents the user with a navigation bar to navigate the various pages of the web app.
@@ -21,23 +19,16 @@ class Header extends Component {
     }
 
 
-    handleSelect = (eventKey) => {
-/*
-        alert(`selected ${eventKey}`);
-*/
-        this.setState({selectedKey: eventKey.valueOf()})
-    }
-
     render() {
         return (
             <Navbar bg="dark" variant="dark" expand="lg">
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav variant="pills" className="mr-auto" activeKey={this.state.selectedKey} onSelect={k => this.handleSelect(k)}>
-                        <Nav.Link eventKey="1" href="/home">Home</Nav.Link>
-                        <Nav.Link eventKey="2" href="/haxonomy">Haxonomy</Nav.Link>
-                        <Nav.Link eventKey="3" href="/administrate">Administrate</Nav.Link>
-                        <Nav.Link eventKey="4" href="/tool">Tool</Nav.Link>
+                    <Nav variant="pills" className="mr-auto">
+                        <Nav.Link eventKey="1"><Link class="nav-link" to ='/home' >Home</Link></Nav.Link>
+                        <Nav.Link eventKey="2"><Link class="nav-link" to ='/haxonomy' >Haxonomy</Link></Nav.Link>
+                        <Nav.Link eventKey="3"><Link class="nav-link" to ='/administrate' >Administrate</Link></Nav.Link>
+                        <Nav.Link eventKey="4"><Link class="nav-link" to ='/tool' >Tool</Link></Nav.Link>
                     </Nav>
                     <AuthButton/>
                 </Navbar.Collapse>
