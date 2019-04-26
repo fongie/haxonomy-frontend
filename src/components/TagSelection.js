@@ -120,7 +120,6 @@ class TagSelection extends Component {
     }
 
     render() {
-
         if (!this.state.data) {
             return <p>LOADING..</p>
         } else {
@@ -133,12 +132,18 @@ class TagSelection extends Component {
                         nodeSize={nodeSize}
                         data={this.state.data}
                         orientation={'horizontal'}
-                        zoom={0.4}
+                        zoom={0.49}
                         separation={separation}
                         nodeSvgShape={svgSquare}
                         textLayout={textLayout}
                         collapsible={false}
                         onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}
+                        separation={{siblings: 0.15, nonSiblings: 0.15}}
+                        zoomable={false}
+                        translate={{
+                            x: 20,
+                            y: 500
+                        }}
                     />
 
                 </div>
