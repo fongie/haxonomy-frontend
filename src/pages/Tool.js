@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {withRouter} from "react-router-dom";
+import {C} from "react-bootstrap";
 
 /**
  * UI for the tool that guides the user through the search for web vulnerabilities
@@ -17,7 +18,9 @@ class Tool extends Component{
     render() {
         return (
             <div>
-                <p>tool</p>
+                <card>
+
+                </card>
             </div>
         )
     }
