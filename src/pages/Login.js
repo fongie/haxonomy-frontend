@@ -75,7 +75,7 @@ class Login extends Component{
             .then((data) => {
                 auth.authenticate(() => {
                     data.role[0].name === "taxonomist" ?
-                    this.setState({ redirectToReferrer: true }, ()=>{auth.user = data.username; this.props.history.replace('/application')})
+                    this.setState({ redirectToReferrer: true }, ()=>{auth.user = data.username; this.props.history.replace('/administrate')})
                 :
                     alert("You are not authorized to use this web site. \n Required authority: applicant \n Your authority: " + data.roles[0].name);
                 });

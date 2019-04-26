@@ -1,8 +1,12 @@
 import React, {Component} from 'react';
-import { Navbar, Nav, PageHeader } from 'react-bootstrap';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter, Link} from 'react-router-dom';
 import {auth} from '../components/Auth';
+import Navbar from 'react-bootstrap/Navbar'
+import Nav from 'react-bootstrap/Nav'
+import Button from 'react-bootstrap/Button'
+/*
 import './Header.css';
+*/
 
 /**
  * Presents the user with a navigation bar to navigate the various pages of the web app.
@@ -12,42 +16,32 @@ class Header extends Component {
         super(props)
 
         this.state = {
+            selectedKey: ""
         }
     }
+
+
+    handleSelect = (eventKey) => {
+/*
+        alert(`selected ${eventKey}`);
+*/
+        this.setState({selectedKey: eventKey.valueOf()})
+    }
+
     render() {
         return (
-            <div>
-                <Navbar bg="primary" variant="dark">
-                    <Navbar.Header>
-                        <Navbar.Brand>
-                            <Link to ='/home' >home</Link>
-                        </Navbar.Brand>
-                    </Navbar.Header>
-                    <Nav>
-                        <Navbar.Brand>
-                            <Link to ='/haxonomy' >haxonomy</Link>
-                        </Navbar.Brand>
+            <Navbar bg="dark" variant="dark" expand="lg">
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav variant="pills" className="mr-auto" activeKey={this.state.selectedKey} onSelect={k => this.handleSelect(k)}>
+                        <Nav.Link eventKey="1" href="/home">Home</Nav.Link>
+                        <Nav.Link eventKey="2" href="/haxonomy">Haxonomy</Nav.Link>
+                        <Nav.Link eventKey="3" href="/administrate">Administrate</Nav.Link>
+                        <Nav.Link eventKey="4" href="/tool">Tool</Nav.Link>
                     </Nav>
-                    <Nav>
-                        <Navbar.Brand>
-                            <Link to ='/administrate' >administrate</Link>
-                        </Navbar.Brand>
-                    </Nav>
-                    <Nav>
-                        <Navbar.Brand>
-                            <Link to ='/tool' >tool</Link>
-                        </Navbar.Brand>
-                    </Nav>
-                    <Navbar.Brand>
-                    <ul className="nav navbar-nav navbar-right">
                     <AuthButton/>
-                    </ul>
-                    </Navbar.Brand>
-                </Navbar>
-{/*
-                {this.props.location.pathname.substring(1)}
-*/}
-            </div>
+                </Navbar.Collapse>
+            </Navbar>
         );
     }
 }
@@ -59,15 +53,15 @@ class Header extends Component {
  */
 const AuthButton = withRouter(({ history }) => (
     auth.isAuthenticated ? (
-            <button type="button" id="headerButton"
+        <Button variant="outline-success" id="headerButton"
                     onClick={() => {
                 auth.signout(() => history.push('/login'))
-            }}>sign out {auth.user}</button>
+            }}>sign out {auth.user}</Button>
     ) : (
-        <button type="button" id="headerButton"
+        <Button variant="outline-success" id="headerButton"
                 onClick={() => {
                     history.replace('/login');
-                }}>log in</button>
+                }}>log in</Button>
     )
 ))
 
