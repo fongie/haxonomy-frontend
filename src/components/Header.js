@@ -33,6 +33,11 @@ class Header extends Component {
                             <Link to ='/administrate' >administrate</Link>
                         </Navbar.Brand>
                     </Nav>
+                    <Nav>
+                        <Navbar.Brand>
+                            <Link to ='/tool' >tool</Link>
+                        </Navbar.Brand>
+                    </Nav>
                     <Navbar.Brand>
                     <ul className="nav navbar-nav navbar-right">
                     <AuthButton/>
