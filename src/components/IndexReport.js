@@ -3,6 +3,7 @@ import {server} from '../config';
 import { withRouter } from 'react-router-dom'
 import CheckBox from './CheckBox';
 import './IndexReport.css';
+import TagSelection from '../components/TagSelection';
 
 /**
  * Presents the user with input fields for registration of new user. Given values are posted to the server using fetch.
@@ -24,7 +25,8 @@ class IndexReport extends Component{
             genericErrorMessage: "*required",
             reportTitle: "",
             terms: null,
-            selectedTerms: []
+            selectedTerms: [],
+            selectedTermNames: [],
 
         }
 
@@ -36,6 +38,8 @@ class IndexReport extends Component{
         this.processURL = this.processURL.bind(this);
         this.fetchTerms = this.fetchTerms.bind(this);
         this.arrangeTerms = this.arrangeTerms.bind(this);
+        this.getTerms = this.getTerms.bind(this);
+        this.showTerms = this.showTerms.bind(this);
     }
 
     componentDidMount() {
@@ -137,6 +141,35 @@ class IndexReport extends Component{
             </label>)
     }
 
+    showTerms(){
+        console.log(this.state.selectedTermNames)
+        if(this.state.selectedTermNames !== null){
+            return <div>
+                { this.state.selectedTermNames.map((term) =>
+                    <text>{term + ", "}</text>)
+                }
+            </div>
+        }
+    }
+
+    getTerms(selectedTerm){
+        let selectedTerms = this.state.selectedTerms;
+        let selectedTermNames = this.state.selectedTermNames;
+        let selectedTermHref = null;
+        let remove = -1;
+        this.state.terms.forEach((term) =>
+            term.name === selectedTerm.name ? selectedTermHref = term.href : null
+        );
+        this.state.selectedTerms.forEach((term, index) =>{
+            if (term === selectedTermHref)
+                remove = index
+        }
+        );
+        remove > -1 ?  selectedTerms.splice(remove, 1) : selectedTerms.push(selectedTermHref)
+        remove > -1 ?  selectedTermNames.splice(remove, 1) : selectedTermNames.push(selectedTerm.name)
+        this.setState({selectedTerms: selectedTerms, selectedTermNames: selectedTermNames}, console.log(this.state.selectedTerms));
+    }
+
     render(){
         return (
             <div>
@@ -148,7 +181,10 @@ class IndexReport extends Component{
                 <br />
                 <button onClick={()=>this.fetchTerms()}>refresh terms</button>
                 <br />
-                {this.selectTerms()}
+                {this.showTerms()}
+                <br />
+                <TagSelection sendTerms={this.getTerms}/>
+                {/*{this.selectTerms()}*/}
                 <br/>
                 <button onClick={()=>this.handleSubmitIndexedReport()}>submit</button>
             </div>
@@ -239,7 +275,8 @@ class IndexReport extends Component{
                 genericErrorMessage: "*required",
                 reportTitle: "",
                 terms: null,
-                selectedTerms: []
+                selectedTerms: [],
+                selectedTermNames: [],
             },
             this.componentDidMount()
         )
