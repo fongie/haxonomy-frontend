@@ -10,6 +10,7 @@ import Footer from "./Footer";
 import Home from '../pages/Home';
 import Haxonomy from './Haxonomy';
 import Administrate from "./Administrate";
+import Tool from "../pages/Tool";
 
 
 /**
@@ -29,6 +30,7 @@ function Auth() {
                 <Route path="/login" component={Login}/>
                 <PrivateRoute path="/administrate" component={Administrate}/>
                 <Route path="/haxonomy" component={Haxonomy}/>
+                <Route path="/tool" component={Tool}/>
 {/*
                 <Footer/>
 */}
