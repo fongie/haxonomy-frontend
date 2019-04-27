@@ -138,11 +138,11 @@ class TagSelection extends Component {
                         textLayout={textLayout}
                         collapsible={false}
                         onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}
-                        separation={{siblings: 0.15, nonSiblings: 0.15}}
+                        separation={{siblings: 0.15, nonSiblings: 0.20}}
                         zoomable={false}
                         translate={{
                             x: 20,
-                            y: 500
+                            y: 550
                         }}
                     />
 

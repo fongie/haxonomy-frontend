@@ -42,7 +42,6 @@ class IndexReport extends Component{
         this.handleSubmitIndexedReport = this.handleSubmitIndexedReport.bind(this);
         this.errors = this.errors.bind(this);
         this.fetchReport = this.fetchReport.bind(this);
-        this.processURL = this.processURL.bind(this);
         this.fetchTerms = this.fetchTerms.bind(this);
         this.arrangeTerms = this.arrangeTerms.bind(this);
         this.getTerms = this.getTerms.bind(this);
@@ -84,6 +83,8 @@ class IndexReport extends Component{
         const target = event.target;
         const value = target.value;
         const name = target.name;
+        if(name === "URL")
+            this.fetchReport(value);
 
         this.setState({
             [name]: value,
@@ -99,12 +100,6 @@ class IndexReport extends Component{
                 term.isChecked =  event.target.checked
         })
         this.setState({terms: terms})
-    }
-
-    processURL(event){
-
-        this.setState({ termTitle: event.target.value })
-        //this.fetchReport(event.target.value);
     }
 
     selectTerms() {
@@ -141,12 +136,14 @@ class IndexReport extends Component{
                 <label>
                     Report Title:
                     <input
+                        id={"titleInput"}
                         name="reportTitle"
                         type="text"
                         value={this.state.reportTitle}
                         onChange={this.handleInputChange} />
                     {!!this.state.reportTitleError && (<p style={{color: 'red', float: "right"}}>{this.state.reportTitleError}</p>)}
                 </label>
+                <br />
                 <label>
                     Bounty:
                     <input
@@ -157,15 +154,6 @@ class IndexReport extends Component{
                     {!!this.state.bountyError && (<p style={{color: 'red', float: "right"}}>{this.state.bountyError}</p>)}
                 </label>
                 <label>
-                    Time:
-                    <input
-                        name="time"
-                        type="number"
-                        value={this.state.time}
-                        onChange={this.handleInputChange} />
-                    {!!this.state.timeError && (<p style={{color: 'red', float: "right"}}>{this.state.timeError}</p>)}
-                </label>
-                <label>
                     Vulnerability Type:
                     <input
                         name="vulnerability"
@@ -173,6 +161,16 @@ class IndexReport extends Component{
                         value={this.state.vulnerability}
                         onChange={this.handleInputChange} />
                     {!!this.state.vulnerabilityError && (<p style={{color: 'red', float: "right"}}>{this.state.vulnerabilityError}</p>)}
+                </label>
+                <label>
+                    Time:
+                    <input
+                        id={"timeInput"}
+                        name="time"
+                        type="number"
+                        value={this.state.time}
+                        onChange={this.handleInputChange} />
+                    {!!this.state.timeError && (<p style={{color: 'red', float: "right"}}>{this.state.timeError}</p>)}
                 </label>
             </div>
         )
@@ -266,14 +264,21 @@ class IndexReport extends Component{
     }
 
     fetchReport(URL){
-
-        fetch(URL + ".json", {
+        const jsonRequest =
+            {
+                "url": URL,
+            }
+        fetch(server + "/reportData", {
             credentials: 'include',
-            method: 'GET',
-            dataType: 'jsonp',
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonRequest),
         })
             .then(response => response.json())
-            .then(data =>{ console.log(data); this.setState({ reportTitle: data.title, termTitle: URL })});
+            .then(data =>{ console.log(data); this.setState({ reportTitle: data.title, bounty: data.bounty, vulnerability: data.vulnerability, termTitle: URL })});
     }
 
     getSelectedTerms() {
