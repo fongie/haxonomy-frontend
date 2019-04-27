@@ -3,6 +3,7 @@ import {server} from '../config';
 import { withRouter } from 'react-router-dom'
 import CheckBox from './CheckBox';
 import './IndexReport.css';
+import TagSelection from '../components/TagSelection';
 
 /**
  * Presents the user with input fields for registration of new user. Given values are posted to the server using fetch.
@@ -21,10 +22,18 @@ class IndexReport extends Component{
             password: "",
             URLError: "",
             reportTitleError: "",
+            bountyError: "",
+            timeError: "",
+            vulnerabilityError: "",
             genericErrorMessage: "*required",
             reportTitle: "",
+            bounty: "",
+            time: "",
+            vulnerability: "",
             terms: null,
-            selectedTerms: []
+            selectedTerms: [],
+            selectedTermNames: [],
+            showTermsTree: false,
 
         }
 
@@ -33,9 +42,10 @@ class IndexReport extends Component{
         this.handleSubmitIndexedReport = this.handleSubmitIndexedReport.bind(this);
         this.errors = this.errors.bind(this);
         this.fetchReport = this.fetchReport.bind(this);
-        this.processURL = this.processURL.bind(this);
         this.fetchTerms = this.fetchTerms.bind(this);
         this.arrangeTerms = this.arrangeTerms.bind(this);
+        this.getTerms = this.getTerms.bind(this);
+        this.showTerms = this.showTerms.bind(this);
     }
 
     componentDidMount() {
@@ -73,6 +83,8 @@ class IndexReport extends Component{
         const target = event.target;
         const value = target.value;
         const name = target.name;
+        if(name === "URL")
+            this.fetchReport(value);
 
         this.setState({
             [name]: value,
@@ -88,12 +100,6 @@ class IndexReport extends Component{
                 term.isChecked =  event.target.checked
         })
         this.setState({terms: terms})
-    }
-
-    processURL(event){
-
-        this.setState({ termTitle: event.target.value })
-        //this.fetchReport(event.target.value);
     }
 
     selectTerms() {
@@ -124,31 +130,102 @@ class IndexReport extends Component{
         </label>)
     }
 
-    reportTitleInput(){
+    inputForm(){
         return (
-            <label>
-                Report Title:
-                <input
-                    name="reportTitle"
-                    type="text"
-                    value={this.state.reportTitle}
-                    onChange={this.handleInputChange} />
-                {!!this.state.reportTitleError && (<p style={{color: 'red', float: "right"}}>{this.state.reportTitleError}</p>)}
-            </label>)
+            <div>
+                <label>
+                    Report Title:
+                    <input
+                        id={"titleInput"}
+                        name="reportTitle"
+                        type="text"
+                        value={this.state.reportTitle}
+                        onChange={this.handleInputChange} />
+                    {!!this.state.reportTitleError && (<p style={{color: 'red', float: "right"}}>{this.state.reportTitleError}</p>)}
+                </label>
+                <br />
+                <label>
+                    Bounty:
+                    <input
+                        name="bounty"
+                        type="number"
+                        value={this.state.bounty}
+                        onChange={this.handleInputChange} />
+                    {!!this.state.bountyError && (<p style={{color: 'red', float: "right"}}>{this.state.bountyError}</p>)}
+                </label>
+                <label>
+                    Vulnerability Type:
+                    <input
+                        name="vulnerability"
+                        type="text"
+                        value={this.state.vulnerability}
+                        onChange={this.handleInputChange} />
+                    {!!this.state.vulnerabilityError && (<p style={{color: 'red', float: "right"}}>{this.state.vulnerabilityError}</p>)}
+                </label>
+                <label>
+                    Time:
+                    <input
+                        id={"timeInput"}
+                        name="time"
+                        type="number"
+                        value={this.state.time}
+                        onChange={this.handleInputChange} />
+                    {!!this.state.timeError && (<p style={{color: 'red', float: "right"}}>{this.state.timeError}</p>)}
+                </label>
+            </div>
+        )
+    }
+
+    showTerms(){
+        if(this.state.selectedTermNames !== null){
+            return <div>
+                { this.state.selectedTermNames.map((term) =>
+                    <text>{term + ", "}</text>)
+                }
+            </div>
+        }
+    }
+
+    getTerms(selectedTerm){
+        let selectedTerms = this.state.selectedTerms;
+        let selectedTermNames = this.state.selectedTermNames;
+        let selectedTermHref = null;
+        let remove = -1;
+        this.state.terms.forEach((term) =>
+            term.name === selectedTerm.name ? selectedTermHref = term.href : null
+        );
+        this.state.selectedTerms.forEach((term, index) =>{
+            if (term === selectedTermHref)
+                remove = index
+        }
+        );
+        remove > -1 ?  selectedTerms.splice(remove, 1) : selectedTerms.push(selectedTermHref)
+        remove > -1 ?  selectedTermNames.splice(remove, 1) : selectedTermNames.push(selectedTerm.name)
+        this.setState({selectedTerms: selectedTerms, selectedTermNames: selectedTermNames}, console.log(this.state.selectedTerms));
+    }
+
+    showTermsTree(){
+        if(this.state.showTermsTree === true){
+        return <div>
+            <button onClick={()=>this.fetchTerms()}>refresh terms</button>
+            <TagSelection sendTerms={this.getTerms}/>
+        </div>}
     }
 
     render(){
         return (
             <div>
-                {this.reportTitleInput()}
-                <br/>
                 {this.URLInput()}
                 <br/>
-                <p>{this.state.reportTitle}</p>
+                {this.inputForm()}
+                <br/>
+                <button onClick={()=> this.setState({showTermsTree: this.state.showTermsTree === false})}> show/hide terms</button>
                 <br />
-                <button onClick={()=>this.fetchTerms()}>refresh terms</button>
+                {this.showTerms()}
                 <br />
-                {this.selectTerms()}
+                {this.state.showTermsTree ? this.showTermsTree() : null}
+                <br />
+                {/*{this.selectTerms()}*/}
                 <br/>
                 <button onClick={()=>this.handleSubmitIndexedReport()}>submit</button>
             </div>
@@ -166,6 +243,18 @@ class IndexReport extends Component{
             this.setState(() => ({ termTitleError: this.state.genericErrorMessage}));
             error = true;
         }
+        if (this.state.bounty === null || this.state.bounty === "") {
+            this.setState(() => ({ bountyError: this.state.genericErrorMessage}));
+            error = true;
+        }
+        if (this.state.time === null || this.state.time === "") {
+            this.setState(() => ({ timeError: this.state.genericErrorMessage}));
+            error = true;
+        }
+        if (this.state.vulnerability === null || this.state.vulnerability === "") {
+            this.setState(() => ({ vulnerabilityError: this.state.genericErrorMessage}));
+            error = true;
+        }
         /*if (this.state.reportTitle === null || this.state.reportTitle === "") {
             this.setState(() => ({ passwordError: this.state.genericErrorMessage}));
             error = true;
@@ -175,14 +264,21 @@ class IndexReport extends Component{
     }
 
     fetchReport(URL){
-
-        fetch(URL + ".json", {
+        const jsonRequest =
+            {
+                "url": URL,
+            }
+        fetch(server + "/reportData", {
             credentials: 'include',
-            method: 'GET',
-            dataType: 'jsonp',
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonRequest),
         })
             .then(response => response.json())
-            .then(data =>{ console.log(data); this.setState({ reportTitle: data.title, termTitle: URL })});
+            .then(data =>{ console.log(data); this.setState({ reportTitle: data.title, bounty: data.bounty, vulnerability: data.vulnerability, termTitle: URL })});
     }
 
     getSelectedTerms() {
@@ -204,7 +300,10 @@ class IndexReport extends Component{
             {
                 "title": this.state.reportTitle,
                 "url": this.state.URL,
-                "terms": this.getSelectedTerms(),
+                "terms": this.state.selectedTerms,
+                "bounty": this.state.bounty,
+                "time": this.state.time,
+                "vulnerability": this.state.vulnerability,
 
             }
         fetch(server + '/reports', {
@@ -239,7 +338,8 @@ class IndexReport extends Component{
                 genericErrorMessage: "*required",
                 reportTitle: "",
                 terms: null,
-                selectedTerms: []
+                selectedTerms: [],
+                selectedTermNames: [],
             },
             this.componentDidMount()
         )
