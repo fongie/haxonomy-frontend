@@ -107,6 +107,15 @@ class Tool extends Component{
         }
     };
 
+    /**
+     * Extracts reports that matches the current action
+     */
+    getReportsMatchingCurrentAction(){
+        for (let key in this.state.data.term.broaderTerm){
+            console.log('name = ' + key + ' reports = ' + this.state.data.term.broaderTerm.reports[key])
+        }
+    }
+
     render() {
         return (
             <CardDeck>
@@ -132,6 +141,7 @@ class Tool extends Component{
                 <Card style={{width: '18rem'}}>
                     <Card.Header>Reports</Card.Header>
                     <ListGroup variant="flush">
+                        {(this.state.data) ? this.getReportsMatchingCurrentAction() : <p>Loading..</p>}
                         <ListGroup.Item action>First report</ListGroup.Item>
                         <ListGroup.Item action>Second report</ListGroup.Item>
                         <ListGroup.Item action>Third report</ListGroup.Item>
