@@ -29,7 +29,7 @@ class Tool extends Component{
     }
 
     initiateState = () => {
-        fetch(server + 'tool/init', {
+        fetch(server + '/tool/init', {
             credentials: 'include',
             method: 'POST',
             headers: {
@@ -50,7 +50,7 @@ class Tool extends Component{
      * GETs the next action in a specified markov state (right now hardcoded to state 1)
      */
     fetchNextAction = () => {
-        fetch(server + "tool/1/next",
+        fetch(server + "/tool/1/next",
             {credentials: 'include'}
         ).then(res => res.json())
             .then((response) => {
