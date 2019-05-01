@@ -23,22 +23,22 @@ class IndexReport extends Component{
             URLError: "",
             reportTitleError: "",
             bountyError: "",
-            timeError: "",
             vulnerabilityError: "",
             genericErrorMessage: "*required",
             reportTitle: "",
             bounty: "",
-            time: "",
             vulnerability: "",
             terms: null,
             selectedTerms: [],
             selectedTermNames: [],
             showTermsTree: false,
+            vulns: null,
+            selectedVuln: null,
 
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+        this.handleVulnboxChange = this.handleVulnboxChange.bind(this);
         this.handleSubmitIndexedReport = this.handleSubmitIndexedReport.bind(this);
         this.errors = this.errors.bind(this);
         this.fetchReport = this.fetchReport.bind(this);
@@ -50,6 +50,7 @@ class IndexReport extends Component{
 
     componentDidMount() {
         this.fetchTerms()
+        this.fetchVulns()
     }
 
 
@@ -67,6 +68,20 @@ class IndexReport extends Component{
             .catch(e => { alert(e.message);})
     }
 
+    fetchVulns(){
+        fetch(server + "/vulnerabilities?size=100000&sort=name",
+            {credentials: 'include'}
+        )
+            .then(res => res.json())
+            .then((response) =>
+            {
+                if (response.error) throw new Error("Something went wrong. Please reload the page.");
+                else return response;
+            })
+            .then(data => this.arrangeVulns(data))
+            .catch(e => { alert(e.message);})
+    }
+
     arrangeTerms(rawTerms){
         let terms = [];
         rawTerms._embedded.terms.forEach((term) =>
@@ -77,6 +92,18 @@ class IndexReport extends Component{
             })
         );
         this.setState({terms: terms})
+    }
+
+    arrangeVulns(rawTerms){
+        let vulns = [];
+        rawTerms.forEach((vuln) =>
+            vulns.push({
+                "name": vuln.name,
+                "isChecked": false,
+                "href": vuln.id,
+            })
+        );
+        this.setState({vulns: vulns})
     }
 
     handleInputChange(event) {
@@ -93,29 +120,30 @@ class IndexReport extends Component{
     }
 
     /* https://medium.com/@tariqul.islam.rony/multiple-checkbox-handling-by-react-js-84b1d49a46c6 */
-    handleCheckboxChange(event) {
-        let terms = this.state.terms
-        terms.forEach(term => {
-            if (term.name === event.target.value)
-                term.isChecked =  event.target.checked
+    handleVulnboxChange(event) {
+        let vulns = this.state.vulns
+        vulns.forEach(vuln => {
+            if (vuln.name == event.target.value)
+                vuln.isChecked =  event.target.checked
         })
-        this.setState({terms: terms})
+        this.setState({vulns: vulns})
     }
 
-    selectTerms() {
-        if(this.state.terms !== null){
+    selectVulns() {
+        if(this.state.vulns !== null){
             return <div id={"selectTermDiv"}>
-                <p id={"formText"}>select terms below:</p>
-                    { this.state.terms.map((term) =>
-                        <ul id={"checkboxUl"} key={term.name}>
+                <p id={"formText"}>select vulnerability type below:</p>
+                { this.state.vulns.map((vuln) =>
+                    <ul id={"checkboxUl"} key={vuln.name}>
                         <label id={"labelBox"}>
-                            <CheckBox handleCheckChildElement={this.handleCheckboxChange} {...term} />
-                            <span id="boxTitle">{term.name + "   "}</span>
+                            <CheckBox handleCheckChildElement={this.handleVulnboxChange} {...vuln} />
+                            <span id="boxTitle">{vuln.name + "   "}</span>
                         </label></ul>)}
             </div>;
 
         }
     }
+
 
     URLInput(){
         return (
@@ -162,16 +190,6 @@ class IndexReport extends Component{
                         onChange={this.handleInputChange} />
                     {!!this.state.vulnerabilityError && (<p style={{color: 'red', float: "right"}}>{this.state.vulnerabilityError}</p>)}
                 </label>
-                <label>
-                    Time:
-                    <input
-                        id={"timeInput"}
-                        name="time"
-                        type="number"
-                        value={this.state.time}
-                        onChange={this.handleInputChange} />
-                    {!!this.state.timeError && (<p style={{color: 'red', float: "right"}}>{this.state.timeError}</p>)}
-                </label>
             </div>
         )
     }
@@ -207,7 +225,6 @@ class IndexReport extends Component{
     showTermsTree(){
         if(this.state.showTermsTree === true){
         return <div>
-            <button onClick={()=>this.fetchTerms()}>refresh terms</button>
             <TagSelection sendTerms={this.getTerms}/>
         </div>}
     }
@@ -219,9 +236,11 @@ class IndexReport extends Component{
                 <br/>
                 {this.inputForm()}
                 <br/>
-                <button onClick={()=> this.setState({showTermsTree: this.state.showTermsTree === false})}> show/hide terms</button>
-                <br />
+                {this.selectVulns()}
+                <br/>
                 {this.showTerms()}
+                <br/>
+                <button onClick={()=> this.setState({showTermsTree: this.state.showTermsTree === false})}> show/hide terms</button>
                 <br />
                 {this.state.showTermsTree ? this.showTermsTree() : null}
                 <br />
@@ -245,10 +264,6 @@ class IndexReport extends Component{
         }
         if (this.state.bounty === null || this.state.bounty === "") {
             this.setState(() => ({ bountyError: this.state.genericErrorMessage}));
-            error = true;
-        }
-        if (this.state.time === null || this.state.time === "") {
-            this.setState(() => ({ timeError: this.state.genericErrorMessage}));
             error = true;
         }
         if (this.state.vulnerability === null || this.state.vulnerability === "") {
@@ -281,12 +296,12 @@ class IndexReport extends Component{
             .then(data =>{ console.log(data); this.setState({ reportTitle: data.title, bounty: data.bounty, vulnerability: data.vulnerability, termTitle: URL })});
     }
 
-    getSelectedTerms() {
-        let selectedTerms = [];
-        this.state.terms.forEach((term) =>
-            term.isChecked ? selectedTerms.push(term.href) : null
+    getSelectedVulns() {
+        let selectedVulns = [];
+        this.state.vulns.forEach((vuln) =>
+            vuln.isChecked ? selectedVulns.push(server + "/terms/" + vuln.href) : null
         );
-        return selectedTerms;
+        return selectedVulns;
     }
 
     /**
@@ -294,18 +309,18 @@ class IndexReport extends Component{
      * @param event
      */
     handleSubmitIndexedReport() {
+        let vulns = this.getSelectedVulns();
+        let terms = this.state.selectedTerms;
         if(this.errors())
             return;
         const jsonRequest =
             {
                 "title": this.state.reportTitle,
                 "url": this.state.URL,
-                "terms": this.state.selectedTerms,
+                "terms": terms.concat(vulns),
                 "bounty": this.state.bounty,
-                "time": this.state.time,
-                "vulnerability": this.state.vulnerability,
-
             }
+            console.log(jsonRequest)
         fetch(server + '/reports', {
             credentials: 'include',
             method: 'POST',
@@ -335,11 +350,16 @@ class IndexReport extends Component{
                 password: "",
                 URLError: "",
                 reportTitleError: "",
+                bountyError: "",
+                vulnerabilityError: "",
                 genericErrorMessage: "*required",
                 reportTitle: "",
-                terms: null,
+                bounty: "",
+                vulnerability: "",
                 selectedTerms: [],
                 selectedTermNames: [],
+                showTermsTree: false,
+                selectedVuln: null,
             },
             this.componentDidMount()
         )

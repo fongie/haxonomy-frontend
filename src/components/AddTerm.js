@@ -18,26 +18,33 @@ class AddTerm extends Component{
 
         this.state = {
             termTitle: "",
+            time: "",
+            timeError: "",
             password: "",
             termTitleError: "",
             genericErrorMessage: "*required",
             terms: null,
-            parent: []
+            parent: [],
+            times: null,
+
 
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+        this.handleTermboxChange = this.handleTermboxChange.bind(this);
+        this.handleTimeboxChange = this.handleTimeboxChange.bind(this);
         this.handleSubmitTerm = this.handleSubmitTerm.bind(this);
         this.errors = this.errors.bind(this);
         this.fetchReport = this.fetchReport.bind(this);
         this.processURL = this.processURL.bind(this);
         this.fetchTerms = this.fetchTerms.bind(this);
         this.arrangeTerms = this.arrangeTerms.bind(this);
+        this.arrangeTimes = this.arrangeTimes.bind(this);
     }
 
     componentDidMount() {
         this.fetchTerms()
+        this.fetchTimes()
     }
 
 
@@ -55,6 +62,20 @@ class AddTerm extends Component{
             .catch(e => { alert(e.message);})
     }
 
+    fetchTimes(){
+        fetch(server + "/times?size=100000&sort=time",
+            {credentials: 'include'}
+        )
+            .then(res => res.json())
+            .then((response) =>
+            {
+                if (response.error) throw new Error("Something went wrong. Please reload the page.");
+                else return response;
+            })
+            .then(data => this.arrangeTimes(data))
+            .catch(e => { alert(e.message);})
+    }
+
     arrangeTerms(rawTerms){
         let terms = [];
         rawTerms._embedded.terms.forEach((term) =>
@@ -65,6 +86,18 @@ class AddTerm extends Component{
             })
         );
         this.setState({terms: terms})
+    }
+
+    arrangeTimes(rawTimes){
+        let times = [];
+        rawTimes._embedded.times.forEach((time) =>
+            times.push({
+                "name": time.time,
+                "isChecked": false,
+                "href": time._links.self.href,
+            })
+        );
+        this.setState({times: times})
     }
 
     handleInputChange(event) {
@@ -79,7 +112,7 @@ class AddTerm extends Component{
     }
 
     /* https://medium.com/@tariqul.islam.rony/multiple-checkbox-handling-by-react-js-84b1d49a46c6 */
-    handleCheckboxChange(event) {
+    handleTermboxChange(event) {
         let terms = this.state.terms
         terms.forEach(term => {
             if (term.name === event.target.value)
@@ -87,6 +120,17 @@ class AddTerm extends Component{
         })
         this.setState({terms: terms})
     }
+
+    handleTimeboxChange(event) {
+        let times = this.state.times
+        times.forEach(time => {
+            if (time.name == event.target.value) {
+                time.isChecked = event.target.checked
+            }
+        })
+        this.setState({times: times})
+    }
+
 
     processURL(event){
 
@@ -101,8 +145,23 @@ class AddTerm extends Component{
                 { this.state.terms.map((term) =>
                     <ul id={"checkboxUl"} key={term.name}>
                         <label id={"labelBox"}>
-                            <CheckBox handleCheckChildElement={this.handleCheckboxChange} {...term} />
+                            <CheckBox handleCheckChildElement={this.handleTermboxChange} {...term} />
                             <span id="boxTitle">{term.name + "   "}</span>
+                        </label></ul>)}
+            </div>;
+
+        }
+    }
+
+    selectTime() {
+        if(this.state.times !== null){
+            return <div id={"selectTimeDiv"}>
+                <p id={"formText"}>select time below:</p>
+                { this.state.times.map((time) =>
+                    <ul id={"checkboxUl"} key={time.name}>
+                        <label id={"labelBox"}>
+                            <CheckBox handleCheckChildElement={this.handleTimeboxChange} {...time} />
+                            <span id="boxTitle">{time.name}</span>
                         </label></ul>)}
             </div>;
 
@@ -112,14 +171,14 @@ class AddTerm extends Component{
     titleInput(){
         return (
             <label>
-                Term Title:
-                <input
-                    name="termTitle"
-                    type="text"
-                    value={this.state.termTitle}
-                    onChange={this.handleInputChange} />
-                {!!this.state.termTitleError && (<p style={{color: 'red', float: "right"}}>{this.state.termTitleError}</p>)}
-            </label>)
+                    Term Title:
+                    <input
+                        name="termTitle"
+                        type="text"
+                        value={this.state.termTitle}
+                        onChange={this.handleInputChange} />
+                    {!!this.state.termTitleError && (<p style={{color: 'red', float: "right"}}>{this.state.termTitleError}</p>)}
+                </label>)
     }
 
 
@@ -128,7 +187,7 @@ class AddTerm extends Component{
             <div >
                 {this.titleInput()}
                 <br/>
-                <p>{this.state.reportTitle}</p>
+                {this.selectTime()}
                 <br />
                 {this.selectTerms()}
                 <br/>
@@ -153,6 +212,10 @@ class AddTerm extends Component{
             this.setState(() => ({ passwordError: this.state.genericErrorMessage}));
             error = true;
         }
+        if (this.state.time === null || this.state.time === "") {
+            this.setState(() => ({ timeError: this.state.genericErrorMessage}));
+            error = true;
+        }
         return error;
 
     }
@@ -175,13 +238,22 @@ class AddTerm extends Component{
         return selectedParent;
     }
 
+    getSelectedTime() {
+        let selectedTime = "";
+        this.state.times.forEach((time) =>
+            time.isChecked ? selectedTime = time : null
+        );
+        return selectedTime;
+    }
+
     /**
      * Checks for errors and then post json to server. Displays error message on failure.
      * @param event
      */
     handleSubmitTerm() {
         let selectedParent = this.getSelectedParent();
-        if (!window.confirm("Term name is: \"" + this.state.termTitle + "\" \nSelected parent is: \"" + selectedParent.name + "\".\n\n\t\t\tOK?"))
+        let selectedTime = this.getSelectedTime();
+        if (!window.confirm("Term name is: \"" + this.state.termTitle + "\" \nSelected parent is: \"" + selectedParent.name + "\" \nSelected time is: \"" + selectedTime.name + "\".\n\n\t\t\tOK?"))
             return;
         if(this.errors())
             return;
@@ -189,7 +261,7 @@ class AddTerm extends Component{
             {
                 "name": this.state.termTitle,
                 "broaderTerm": selectedParent.href,
-
+                "time": selectedTime.href,
             }
         fetch(server + '/terms', {
             credentials: 'include',
@@ -217,12 +289,13 @@ class AddTerm extends Component{
 
     resetState(){
         this.setState({
-            termTitle: "",
-            password: "",
-            termTitleError: "",
-            genericErrorMessage: "*required",
-            terms: null,
-            parent: []
+                termTitle: "",
+                time: "",
+                timeError: "",
+                password: "",
+                termTitleError: "",
+                genericErrorMessage: "*required",
+                parent: [],
         },
             this.componentDidMount()
         )
