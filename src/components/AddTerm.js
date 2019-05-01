@@ -281,8 +281,7 @@ class AddTerm extends Component{
             alert("Term created");
             this.resetState();
 
-        })
-            .catch((e) => {
+        }).catch((e) => {
                 alert(e.message);
             });
     }

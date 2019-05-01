@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import {withRouter} from "react-router-dom";
-import {Row, Col} from "react-bootstrap";
+import './Tool.css';
+import {server} from '../config';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
-import CardColumns from 'react-bootstrap/CardColumns'
 import CardDeck from 'react-bootstrap/CardDeck'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 
@@ -13,11 +12,107 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
  */
 class Tool extends Component{
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
+            data: undefined,
+            numberOfActions: 0,
+            actionStatus: undefined // must be true or false before sending to backend
+        }
+    }
 
+    componentDidMount(){
+        //TODO POST a request http://localhost:8080/tool/init
+        this.initiateState();
+        this.fetchNextAction();
+    }
+
+    initiateState = () => {
+        fetch(server + 'tool/init', {
+            credentials: 'include',
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => {
+            return response.json();
+        }).then((response) => {
+            if(response.error) throw new Error("Something went wrong, please try again in a few minutes");
+            else return response;
+        }).catch((e) => {
+            alert(e.message);
+        });
+    };
+
+    /**
+     * GETs the next action in a specified markov state (right now hardcoded to state 1)
+     */
+    fetchNextAction = () => {
+        fetch(server + "tool/1/next",
+            {credentials: 'include'}
+        ).then(res => res.json())
+            .then((response) => {
+                if (response.error) throw new Error("Something went wrong. Please reload the page.");
+                else return response;
+            })
+            .then(res => {
+                this.setState({data: res})
+            })
+/*            .then(() => console.log(this.data))*/
+            .catch(e => {
+                alert(e.message);
+            });
+
+        this.setState({numberOfActions: this.state.numberOfActions + 1}) // update number of actions
+    };
+
+    /**
+     * Updates answer to true or false and then calls the server via sendActionAnswerToServer, because of async
+     * @param bool
+     */
+    handleActionAnswer = (bool) => {
+        this.setState({actionStatus: bool},
+            this.sendActionAnswerToServer);
+    };
+
+    sendActionAnswerToServer = () => {
+        if(this.state.actionStatus !== undefined){
+
+            alert("You choose " + this.state.actionStatus);
+
+            const jsonRequest = {
+                "actionStatus": this.state.actionStatus
+            };
+
+            fetch(server + '/terms', {
+                credentials: 'include',
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonRequest),
+            }).then((response) => {
+                return response.json();
+            }).then((response) => {
+                if(response.error) throw new Error("Something went wrong, please try again in a few minutes");
+                else return response;
+            }).catch((e) => {
+                alert(e.message);
+            });
+
+            this.fetchNextAction(); // fetch next action
+        }
+    };
+
+    /**
+     * Extracts reports that matches the current action
+     */
+    getReportsMatchingCurrentAction(){
+        for (let key in this.state.data.term.broaderTerm){
+            console.log('name = ' + key + ' reports = ' + this.state.data.term.broaderTerm.reports[key])
         }
     }
 
@@ -26,21 +121,34 @@ class Tool extends Component{
             <CardDeck>
                 <Card style={{width: '45vw'}}>
                     <Card.Body>
-                        <Card.Title>Next action</Card.Title>
+                        <Card.Title>
+                            Next Action
+                        </Card.Title>
                         <Card.Text>
-                            Does the site have HTTPS
+                            {(this.state.data) ? "Does the site have '" + this.state.data.term.name + "'" : <p>LOADING..</p>}
                         </Card.Text>
-                        <Button variant="primary" style={{margin:'0.5em'}}>YES</Button>
-                        <Button variant="primary">NO</Button>
+                        <Button variant="primary"
+                                style={{margin: '0.5em'}}
+                                onClick={() => this.handleActionAnswer(true)}
+                        >YES
+                        </Button>
+                        <Button variant="primary"
+                                onClick={() => this.handleActionAnswer(false)}
+                        >NO
+                        </Button>
                     </Card.Body>
                 </Card>
                 <Card style={{width: '18rem'}}>
                     <Card.Header>Reports</Card.Header>
                     <ListGroup variant="flush">
-                        <ListGroup.Item>First report</ListGroup.Item>
-                        <ListGroup.Item>Second report</ListGroup.Item>
-                        <ListGroup.Item>Third report</ListGroup.Item>
+                        {(this.state.data) ? this.getReportsMatchingCurrentAction() : <p>Loading..</p>}
+                        <ListGroup.Item action>First report</ListGroup.Item>
+                        <ListGroup.Item action>Second report</ListGroup.Item>
+                        <ListGroup.Item action>Third report</ListGroup.Item>
                     </ListGroup>
+                    <Card.Footer>
+                        <small className="text-muted">Based on 3 actions</small>
+                    </Card.Footer>
                 </Card>
                 <Card>
                     <p>Injection</p>
