@@ -35,7 +35,6 @@ class AddTerm extends Component{
         this.handleTimeboxChange = this.handleTimeboxChange.bind(this);
         this.handleSubmitTerm = this.handleSubmitTerm.bind(this);
         this.errors = this.errors.bind(this);
-        this.fetchReport = this.fetchReport.bind(this);
         this.processURL = this.processURL.bind(this);
         this.fetchTerms = this.fetchTerms.bind(this);
         this.arrangeTerms = this.arrangeTerms.bind(this);
@@ -208,26 +207,8 @@ class AddTerm extends Component{
             this.setState(() => ({ termTitleError: this.state.genericErrorMessage}));
             error = true;
         }
-        if (this.state.reportTitle === null || this.state.reportTitle === "") {
-            this.setState(() => ({ passwordError: this.state.genericErrorMessage}));
-            error = true;
-        }
-        if (this.state.time === null || this.state.time === "") {
-            this.setState(() => ({ timeError: this.state.genericErrorMessage}));
-            error = true;
-        }
         return error;
 
-    }
-
-    fetchReport(URL){
-
-        fetch(URL + ".json", {
-            credentials: 'include',
-            method: 'GET',
-        })
-            .then(response => response.json())
-            .then(data => this.setState({ reportTitle: data.title, termTitle: URL }));
     }
 
     getSelectedParent() {
