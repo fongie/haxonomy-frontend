@@ -5,6 +5,8 @@ import './Haxonomy.css';
 import Tree from 'react-d3-tree';
 import VerticallyCenteredModal from './VerticallyCenteredModal';
 
+
+
 /**
  * Layout of rectangle formed nodes
  * @type {{shape: string, shapeProps: {width: number, height: number, x: number, y: number, rx: number, ry: number}}}

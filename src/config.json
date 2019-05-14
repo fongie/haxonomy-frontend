@@ -1,7 +1,12 @@
 {
-  "server" : "https://haxonomy-backend.herokuapp.com",
+  "server" : "http://localhost:8080",
   "terms" : "/terms",
   "reports": "/reports",
-  "tree": "/tree"
+  "tree": "/tree",
+  "replies": "/replies",
+  "markovaction": "/markovActions",
+  "tool": "/tool",
+  "next": "/next",
+  "init": "/tool/init"
 }
 

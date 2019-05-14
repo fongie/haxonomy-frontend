@@ -1,11 +1,20 @@
 import React, {Component} from 'react';
 import './Tool.css';
-import {server} from '../config';
+import {server, replies, markovaction, tool, next, init} from '../config';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 import CardDeck from 'react-bootstrap/CardDeck'
 import ProgressBar from 'react-bootstrap/ProgressBar'
+
+
+/**
+ * Actions
+ * @type {string}
+ */
+const unknown = "UNKNOWN";
+const yes = "YES";
+const no = "NO";
 
 /**
  * UI for the tool that guides the user through the search for web vulnerabilities
@@ -18,18 +27,21 @@ class Tool extends Component{
         this.state = {
             data: undefined,
             numberOfActions: 0,
-            actionStatus: undefined // must be true or false before sending to backend
+            actionStatus: unknown, // must be YES or NO before sending to backend
+            markovStateId: 1
         }
     }
 
     componentDidMount(){
         //TODO POST a request http://localhost:8080/tool/init
+/*
         this.initiateState();
+*/
         this.fetchNextAction();
     }
 
     initiateState = () => {
-        fetch(server + '/tool/init', {
+        fetch(server + init, {
             credentials: 'include',
             method: 'POST',
             headers: {
@@ -50,7 +62,7 @@ class Tool extends Component{
      * GETs the next action in a specified markov state (right now hardcoded to state 1)
      */
     fetchNextAction = () => {
-        fetch(server + "/tool/1/next",
+        fetch(server + tool + "/" + this.state.markovStateId + next,
             {credentials: 'include'}
         ).then(res => res.json())
             .then((response) => {
@@ -60,7 +72,6 @@ class Tool extends Component{
             .then(res => {
                 this.setState({data: res})
             })
-/*            .then(() => console.log(this.data))*/
             .catch(e => {
                 alert(e.message);
             });
@@ -69,26 +80,32 @@ class Tool extends Component{
     };
 
     /**
-     * Updates answer to true or false and then calls the server via sendActionAnswerToServer, because of async
-     * @param bool
+     * Updates answer to YES or NO, then calls the server via sendActionAnswerToServer, because of async
+     * @param answer
      */
-    handleActionAnswer = (bool) => {
-        this.setState({actionStatus: bool},
+    handleActionAnswer = (answer) => {
+        this.setState({actionStatus: answer},
             this.sendActionAnswerToServer);
     };
 
     sendActionAnswerToServer = () => {
-        if(this.state.actionStatus !== undefined){
+        if(this.state.actionStatus !== unknown){
+            let jsonRequest = {};
 
-            alert("You choose " + this.state.actionStatus);
+            //check if the answer from the user, actionStatus === the Reply (YES or NO) that we got from the server when answering this question
+            if (this.state.actionStatus === this.state.data.reply.name){
+                jsonRequest = {
+                    "reply": server + tool + "/" + this.state.markovStateId + "/" + next
+                }
+            } else {
+                jsonRequest = {
+                    "reply": server + replies + "/" + this.state.actionStatus
+                }
+            }
 
-            const jsonRequest = {
-                "actionStatus": this.state.actionStatus
-            };
-
-            fetch(server + '/terms', {
+            fetch(server + markovaction + "/" + this.state.data.id, {
                 credentials: 'include',
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -111,9 +128,9 @@ class Tool extends Component{
      * Extracts reports that matches the current action
      */
     getReportsMatchingCurrentAction(){
-        for (let key in this.state.data.term.broaderTerm){
+       /* for (let key in this.state.data.term.broaderTerm){
             console.log('name = ' + key + ' reports = ' + this.state.data.term.broaderTerm.reports[key])
-        }
+        }*/
     }
 
     render() {
@@ -129,11 +146,11 @@ class Tool extends Component{
                         </Card.Text>
                         <Button variant="primary"
                                 style={{margin: '0.5em'}}
-                                onClick={() => this.handleActionAnswer(true)}
+                                onClick={() => this.handleActionAnswer(yes)}
                         >YES
                         </Button>
                         <Button variant="primary"
-                                onClick={() => this.handleActionAnswer(false)}
+                                onClick={() => this.handleActionAnswer(no)}
                         >NO
                         </Button>
                     </Card.Body>
@@ -141,7 +158,7 @@ class Tool extends Component{
                 <Card style={{width: '18rem'}}>
                     <Card.Header>Reports</Card.Header>
                     <ListGroup variant="flush">
-                        {(this.state.data) ? this.getReportsMatchingCurrentAction() : <p>Loading..</p>}
+                        {(this.state.data) ? this.getReportsMatchingCurrentAction() : <span>Loading..</span>}
                         <ListGroup.Item action>First report</ListGroup.Item>
                         <ListGroup.Item action>Second report</ListGroup.Item>
                         <ListGroup.Item action>Third report</ListGroup.Item>
