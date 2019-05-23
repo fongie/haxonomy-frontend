@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import _ from 'lodash';
 import {server, terms, reports} from '../config';
 import { withRouter } from 'react-router-dom';
 import './Haxonomy.css';
@@ -82,13 +83,40 @@ class Haxonomy extends Component {
             data: undefined,
             nodeData: undefined,
             reportsInModal: null,
+            vulnsInModal: [],
         };
 
         this.fetchTerms = this.fetchTerms.bind(this);
+        this.fetchVulnerabilities = this.fetchVulnerabilities.bind(this);
     }
 
     componentDidMount() {
         this.fetchTerms()
+    }
+
+    fetchVulnerabilities() {
+        let newVulns = []
+
+        for (let i = 0; i < this.state.reportsInModal.length; i++) {
+            let report = this.state.reportsInModal[i]
+            let vuln = report.vulnerability
+
+            if (typeof vuln == 'undefined' || typeof vuln.name == 'undefined') {
+                continue;
+            }
+
+            if (_.find(newVulns, (obj) => vuln.name != undefined && obj.name === vuln.name)) {
+                newVulns = newVulns.map(
+                    (v) => v.name == vuln.name ? {name : v.name, count: v.count+=1} : v
+                );
+            } else {
+                newVulns.push({
+                    name: vuln.name,
+                    count: 1
+                })
+            }
+        }
+        this.setState({ vulnsInModal: newVulns });
     }
 
     /**
@@ -124,8 +152,10 @@ class Haxonomy extends Component {
             })
             .then(res => {this.setState({reportsInModal: res._embedded.reports})
             })
+            .then(() => this.fetchVulnerabilities())
             .catch(e => { alert(e.message);})
     }
+
 
     /**
      * Handles clicks on nodes, updates node data state and show modal
@@ -138,36 +168,37 @@ class Haxonomy extends Component {
     }
 
     render() {
-        let modalClose = () => this.setState({ modalShow: false, reportsInModal: null });
+        let modalClose = () => this.setState({ modalShow: false, reportsInModal: null, vulnsInModal: [] });
 
         if (!this.state.data) {
             return <p>LOADING..</p>
         } else {
-        return (
+            return (
                 <div id="treeWrapper" className="haxContainer">
 
-                        <VerticallyCenteredModal
-                            show={this.state.modalShow}
-                            onHide={modalClose}
-                            nodeData={this.state.nodeData}
-                            reports={this.state.reportsInModal}
-                        />
-
-                    <Tree
-                        styles={customStyles}
-                        pathFunc={"diagonal"}
-                        nodeSize={nodeSize}
-                        data={this.state.data}
-                        orientation={'horizontal'}
-                        zoom={0.6}
-                        separation={separation}
-                        nodeSvgShape={svgSquare}
-                        textLayout={textLayout}
-                        collapsible={false}
-                        onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}
+                    <VerticallyCenteredModal
+                        show={this.state.modalShow}
+                        onHide={modalClose}
+                        nodeData={this.state.nodeData}
+                        reports={this.state.reportsInModal}
+                        vulns={this.state.vulnsInModal}
                     />
 
-                </div>
+                <Tree
+                    styles={customStyles}
+                    pathFunc={"diagonal"}
+                    nodeSize={nodeSize}
+                    data={this.state.data}
+                    orientation={'horizontal'}
+                    zoom={0.6}
+                    separation={separation}
+                    nodeSvgShape={svgSquare}
+                    textLayout={textLayout}
+                    collapsible={false}
+                    onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}
+                />
+
+        </div>
             );
         }
     }
