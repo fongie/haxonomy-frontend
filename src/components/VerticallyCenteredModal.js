@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal, Button } from 'react-bootstrap';
+import VulnerabilityTable from './VulnerabilityTable';
 
 const VerticallyCenteredModal = (props) => {
     return (
@@ -19,7 +20,8 @@ const VerticallyCenteredModal = (props) => {
                 <h4>
                     {props.nodeData != null ? props.nodeData.name : 'Links'}
                 </h4>
-                {
+                <VulnerabilityTable vulns={props.vulns} />
+                { //TODO root term vulnerability table is wrong - why
                     props.reports != null
                         ?
                         reportLinks(props.reports)
@@ -43,10 +45,12 @@ const reportLinks = (reports) => {
                         <p>There are no reports in this category</p>
                         :
                         reports.map(
-                            (report) =>
+                            (report,i) =>
                                 <LinkToReport
                                     title = {report.title}
                                     url = {report.url}
+                                    bounty = {report.bounty}
+                                    key = {i*213897123}
                                 />
                         )
                 }
@@ -61,7 +65,7 @@ const LinkToReport = (props) => (
                 target = "_blank"
                 rel="noopener noreferrer"
             >
-                {props.title}
+                ${props.bounty} : {props.title}
             </a>
         </div>
         );
