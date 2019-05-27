@@ -8,8 +8,8 @@ import Register from '../pages/Register';
 import Header from "./Header";
 import Footer from "./Footer";
 import Home from '../pages/Home';
-import Haxonomy from './Haxonomy';
-import Administrate from "./Administrate";
+import Haxonomy from '../pages/Haxonomy';
+import Administrate from "../pages/Administrate";
 import Tool from "../pages/Tool";
 
 

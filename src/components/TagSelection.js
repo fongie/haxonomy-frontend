@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {server, terms, reports} from '../config';
 import { withRouter } from 'react-router-dom';
-import './Haxonomy.css';
+import '../pages/Haxonomy.css';
 import Tree from 'react-d3-tree';
 import VerticallyCenteredModal from './VerticallyCenteredModal';
 
