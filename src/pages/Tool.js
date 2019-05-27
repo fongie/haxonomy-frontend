@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './Tool.css';
-import {server, replies, markovaction, tool, next, init} from '../config';
+import {server, replies, markovaction, tool, next, init, terms, reports} from '../config';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -28,7 +28,8 @@ class Tool extends Component{
             data: undefined,
             numberOfActions: 0,
             actionStatus: unknown, // must be YES or NO before sending to backend
-            markovStateId: 1
+            markovStateId: 1,
+            reports: null,
         }
     }
 
@@ -58,6 +59,23 @@ class Tool extends Component{
         });
     };
 
+    fetchReports = (termId) => {
+        const url = server + terms + "/" + termId + reports;
+        fetch(url,
+            {credentials: 'include'}
+        )
+            .then(res => res.json())
+            .then((response) => {
+                console.log(response);
+                if (response.error) throw new Error("Something went wrong. Please reload the page.");
+                else return response;
+            })
+            .then(res => {this.setState({reports: res._embedded.reports}, console.log(this.state.reports))
+            })
+            .catch(e => { alert(e.message);})
+    }
+
+
     /**
      * GETs the next action in a specified markov state (right now hardcoded to state 1)
      */
@@ -70,13 +88,11 @@ class Tool extends Component{
                 else return response;
             })
             .then(res => {
-                this.setState({data: res})
+                this.setState({data: res, markovStateId: res.markovState.id, numberOfActions: this.state.numberOfActions + 1}, this.fetchReports(res.term.id))
             })
             .catch(e => {
                 alert(e.message);
             });
-
-        this.setState({numberOfActions: this.state.numberOfActions + 1}) // update number of actions
     };
 
     /**
@@ -159,12 +175,16 @@ class Tool extends Component{
                     <Card.Header>Reports</Card.Header>
                     <ListGroup variant="flush">
                         {(this.state.data) ? this.getReportsMatchingCurrentAction() : <span>Loading..</span>}
-                        <ListGroup.Item action>First report</ListGroup.Item>
-                        <ListGroup.Item action>Second report</ListGroup.Item>
-                        <ListGroup.Item action>Third report</ListGroup.Item>
+                        {
+                            this.state.reports != null
+                                ?
+                                reportLinks(this.state.reports)
+                                :
+                                <p>Loading..</p>
+                        }
                     </ListGroup>
                     <Card.Footer>
-                        <small className="text-muted">Based on 3 actions</small>
+                        <small className="text-muted">{this.state.numberOfActions}</small>
                     </Card.Footer>
                 </Card>
                 <Card>
@@ -182,5 +202,36 @@ class Tool extends Component{
     }
 
 }
+
+const reportLinks = (reports) => {
+    return (
+        <div>
+            {
+                reports.length < 1
+                    ?
+                    <p>There are no reports in this category</p>
+                    :
+                    reports.map(
+                        (report) =>
+                            <LinkToReport
+                                title = {report.title}
+                                url = {report.url}
+                            />
+                    )
+            }
+        </div>
+    );
+}
+const LinkToReport = (props) => (
+    <div>
+        <a
+            href ={props.url}
+            target = "_blank"
+            rel="noopener noreferrer"
+        >
+            {props.title}
+        </a>
+    </div>
+);
 
 export default Tool;
