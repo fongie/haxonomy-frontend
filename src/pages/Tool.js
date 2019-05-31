@@ -25,7 +25,7 @@ class Tool extends Component{
         super(props);
 
         this.state = {
-            data: undefined,
+            data: null,
             numberOfActions: 0,
             actionStatus: unknown, // must be YES or NO before sending to backend
             markovStateId: 1,
@@ -80,6 +80,7 @@ class Tool extends Component{
      * GETs the next action in a specified markov state (right now hardcoded to state 1)
      */
     fetchNextAction = () => {
+        console.log(this.state.markovStateId)
         fetch(server + tool + "/" + this.state.markovStateId + next,
             {credentials: 'include'}
         ).then(res => res.json())
@@ -88,7 +89,22 @@ class Tool extends Component{
                 else return response;
             })
             .then(res => {
-                this.setState({data: res, markovStateId: res.markovState.id, numberOfActions: this.state.numberOfActions + 1}, this.fetchReports(res.term.id))
+                if(res.id !== 999999999){
+                    if(res.term.broaderTerm.name === "Vulnerabilities"){
+                        if(res.reply.name === no){
+                            this.setState({data: res, markovStateId: res.markovState.id, actionStatus: no}, this.sendActionAnswerToServer)}
+                        else{
+                            this.setState({vulnMode: true, data: res, markovStateId: res.markovState.id, numberOfActions: this.state.numberOfActions + 1}, this.fetchReports(res.term.id))}
+                    }
+                    else{
+                        this.setState({data: res, markovStateId: res.markovState.id, numberOfActions: this.state.numberOfActions + 1})}
+                }
+                else{
+                    this.reset();
+                    alert("No more suggestions. Need more training. Resetting suggestions")
+                }
+
+
             })
             .catch(e => {
                 alert(e.message);
@@ -100,43 +116,46 @@ class Tool extends Component{
      * @param answer
      */
     handleActionAnswer = (answer) => {
-        this.setState({actionStatus: answer},
-            this.sendActionAnswerToServer);
+        if(answer === yes && this.state.data)
+            this.fetchReports(this.state.data.term.id)
+
+        this.setState({actionStatus: answer}, this.sendActionAnswerToServer);
     };
 
     sendActionAnswerToServer = () => {
+        console.log(this.state.actionStatus)
         if(this.state.actionStatus !== unknown){
             let jsonRequest = {};
 
             //check if the answer from the user, actionStatus === the Reply (YES or NO) that we got from the server when answering this question
             if (this.state.actionStatus === this.state.data.reply.name){
-                jsonRequest = {
-                    "reply": server + tool + "/" + this.state.markovStateId + "/" + next
-                }
+                this.fetchNextAction();
             } else {
                 jsonRequest = {
-                    "reply": server + replies + "/" + this.state.actionStatus
+                    "reply": server + tool + "/mismatch" + this.state.markovStateId + "/" + this.state.actionStatus + "/" + this.state.data.term.name
                 }
+
+
+                console.log(jsonRequest);
+                fetch(server + markovaction + "/" + this.state.data.id, {
+                    credentials: 'include',
+                    method: 'PATCH',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonRequest),
+                }).then((response) => {
+                    return response.json();
+                }).then((response) => {
+                    if (response.error) throw new Error("Something went wrong, please try again in a few minutes");
+                    else return response;
+                }).then((response) => {
+                }).catch((e) => {
+                    alert(e.message);
+                });
             }
-
-            fetch(server + markovaction + "/" + this.state.data.id, {
-                credentials: 'include',
-                method: 'PATCH',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jsonRequest),
-            }).then((response) => {
-                return response.json();
-            }).then((response) => {
-                if(response.error) throw new Error("Something went wrong, please try again in a few minutes");
-                else return response;
-            }).catch((e) => {
-                alert(e.message);
-            });
-
-            this.fetchNextAction(); // fetch next action
+            // fetch next action
         }
     };
 
@@ -151,55 +170,84 @@ class Tool extends Component{
 
     render() {
         return (
-            <CardDeck>
-                <Card style={{width: '45vw'}}>
-                    <Card.Body>
-                        <Card.Title>
-                            Next Action
-                        </Card.Title>
-                        <Card.Text>
-                            {(this.state.data) ? "Does the site have '" + this.state.data.term.name + "'" : <p>LOADING..</p>}
-                        </Card.Text>
-                        <Button variant="primary"
-                                style={{margin: '0.5em'}}
-                                onClick={() => this.handleActionAnswer(yes)}
-                        >YES
-                        </Button>
-                        <Button variant="primary"
-                                onClick={() => this.handleActionAnswer(no)}
-                        >NO
-                        </Button>
-                    </Card.Body>
-                </Card>
-                <Card style={{width: '18rem'}}>
-                    <Card.Header>Reports</Card.Header>
-                    <ListGroup variant="flush">
-                        {(this.state.data) ? this.getReportsMatchingCurrentAction() : <span>Loading..</span>}
-                        {
-                            this.state.reports != null
-                                ?
-                                reportLinks(this.state.reports)
-                                :
-                                <p>Loading..</p>
-                        }
-                    </ListGroup>
-                    <Card.Footer>
-                        <small className="text-muted">{this.state.numberOfActions}</small>
-                    </Card.Footer>
-                </Card>
-                <Card>
-                    <p>Injection</p>
-                    <ProgressBar striped variant="success" now={40}/>
-                    <p>Broken Authentication</p>
-                    <ProgressBar striped variant="info" now={20}/>
-                    <p>Sensitive Data Exposure</p>
-                    <ProgressBar striped variant="warning" now={60}/>
-                    <p>XML External Entities</p>
-                    <ProgressBar striped variant="danger" now={80}/>
-                </Card>
-            </CardDeck>
+            <div>
+                <br/>
+                <CardDeck>
+                    {this.state.vulnMode ? this.vulnBox() : this.nextActionBox()}
+                    <Card style={{width: '18rem'}}>
+                        <Card.Header>Reports</Card.Header>
+                        <ListGroup variant="flush">
+                            {/*{(this.state.data) ? this.getReportsMatchingCurrentAction() : <span>Loading..</span>}*/}
+                            {
+                                this.state.reports != null
+                                    ?
+                                    reportLinks(this.state.reports)
+                                    :
+                                    <p>Loading..</p>
+                            }
+                        </ListGroup>
+                        <Card.Footer>
+                            <small className="text-muted">{"Based on " + this.state.numberOfActions + " questions"}</small>
+                        </Card.Footer>
+                    </Card>
+                </CardDeck>
+            </div>
         )
     }
+
+    vulnBox(){
+        return <Card style={{width: '45vw'}}>
+            <Card.Body>
+                <Card.Title>
+                    VULNERABILITY ALERT
+                </Card.Title>
+                <Card.Text>
+                    {(this.state.data) ? "Try the following attack: " + this.state.data.term.name  : <p>LOADING..</p>}
+                </Card.Text>
+                <Button variant="primary"
+                        style={{margin: '0.5em'}}
+                        onClick={() => this.setState({vulnMode: false}, this.handleActionAnswer(yes))}
+                >SUCCESS
+                </Button>
+                <Button variant="primary"
+                        onClick={() => this.setState({vulnMode: false}, this.handleActionAnswer(no))}
+                >FAIL
+                </Button>
+            </Card.Body>
+        </Card>
+    }
+
+    nextActionBox(){
+        return <Card style={{width: '45vw'}}>
+            <Card.Body>
+                <Card.Title>
+                    Next Action
+                </Card.Title>
+                <Card.Text>
+                    {(this.state.data) ? "Does the site have '" + this.state.data.term.name + "'" : <p>LOADING..</p>}
+                </Card.Text>
+                <Button variant="primary"
+                        style={{margin: '0.5em'}}
+                        onClick={() => this.handleActionAnswer(yes)}
+                >YES
+                </Button>
+                <Button variant="primary"
+                        onClick={() => this.handleActionAnswer(no)}
+                >NO
+                </Button>
+            </Card.Body>
+        </Card>
+    }
+
+    reset() {
+        this.setState({
+            data: null,
+            numberOfActions: 0,
+            actionStatus: unknown, // must be YES or NO before sending to backend
+            markovStateId: 1,
+        }, this.fetchNextAction())
+    }
+
 
 }
 
