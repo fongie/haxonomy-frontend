@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import { withRouter } from 'react-router-dom'
-import IndexReport from "./IndexReport";
-import AddTerm from "./AddTerm";
+import IndexReport from "../components/IndexReport";
+import AddTerm from "../components/AddTerm";
 import './Administrate.css';
 
 /**
