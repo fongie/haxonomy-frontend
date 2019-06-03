@@ -4,9 +4,7 @@ import {server, terms, reports} from '../config';
 import { withRouter } from 'react-router-dom';
 import './Haxonomy.css';
 import Tree from 'react-d3-tree';
-import VerticallyCenteredModal from './VerticallyCenteredModal';
-
-
+import VerticallyCenteredModal from '../components/VerticallyCenteredModal';
 
 /**
  * Layout of rectangle formed nodes
@@ -186,21 +184,21 @@ class Haxonomy extends Component {
                         vulns={this.state.vulnsInModal}
                     />
 
-                <Tree
-                    styles={customStyles}
-                    pathFunc={"diagonal"}
-                    nodeSize={nodeSize}
-                    data={this.state.data}
-                    orientation={'horizontal'}
-                    zoom={0.6}
-                    separation={separation}
-                    nodeSvgShape={svgSquare}
-                    textLayout={textLayout}
-                    collapsible={false}
-                    onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}
-                />
+                    <Tree
+                        styles={customStyles}
+                        pathFunc={"diagonal"}
+                        nodeSize={nodeSize}
+                        data={this.state.data}
+                        orientation={'horizontal'}
+                        zoom={0.6}
+                        separation={separation}
+                        nodeSvgShape={svgSquare}
+                        textLayout={textLayout}
+                        collapsible={false}
+                        onClick={((nodeData, evt) => this.handleClick(nodeData, evt))}
+                    />
 
-        </div>
+                </div>
             );
         }
     }
