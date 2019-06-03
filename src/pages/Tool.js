@@ -82,7 +82,13 @@ class Tool extends Component{
     fetchNextAction = () => {
         console.log(this.state.markovStateId)
         fetch(server + tool + "/" + this.state.markovStateId + next,
-            {credentials: 'include'}
+            {credentials: 'include',
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }
         ).then(res => res.json())
             .then((response) => {
                 if (response.error) throw new Error("Something went wrong. Please reload the page.");
@@ -111,6 +117,44 @@ class Tool extends Component{
             });
     };
 
+    fetchOtherNextAction = () => {
+        console.log(this.state.markovStateId)
+        fetch(server + tool + "/mismatch/" + this.state.markovStateId + "/" + this.state.actionStatus + "/" + this.state.data.term.id,
+            {credentials: 'include',
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }
+        ).then(res => res.json())
+            .then((response) => {
+                if (response.error) throw new Error("Something went wrong. Please reload the page.");
+                else return response;
+            })
+            .then(res => {
+                if(res.id !== 999999999){
+                    if(res.term.broaderTerm.name === "Vulnerabilities"){
+                        if(res.reply.name === no){
+                            this.setState({data: res, markovStateId: res.markovState.id, actionStatus: no}, this.sendActionAnswerToServer)}
+                        else{
+                            this.setState({vulnMode: true, data: res, markovStateId: res.markovState.id, numberOfActions: this.state.numberOfActions + 1}, this.fetchReports(res.term.id))}
+                    }
+                    else{
+                        this.setState({data: res, markovStateId: res.markovState.id, numberOfActions: this.state.numberOfActions + 1})}
+                }
+                else{
+                    this.reset();
+                    alert("No more suggestions. Need more training. Resetting suggestions")
+                }
+
+
+            })
+            .catch(e => {
+                alert(e.message);
+            });
+    }
+
     /**
      * Updates answer to YES or NO, then calls the server via sendActionAnswerToServer, because of async
      * @param answer
@@ -125,37 +169,13 @@ class Tool extends Component{
     sendActionAnswerToServer = () => {
         console.log(this.state.actionStatus)
         if(this.state.actionStatus !== unknown){
-            let jsonRequest = {};
 
             //check if the answer from the user, actionStatus === the Reply (YES or NO) that we got from the server when answering this question
             if (this.state.actionStatus === this.state.data.reply.name){
                 this.fetchNextAction();
             } else {
-                jsonRequest = {
-                    "reply": server + tool + "/mismatch" + this.state.markovStateId + "/" + this.state.actionStatus + "/" + this.state.data.term.name
-                }
-
-
-                console.log(jsonRequest);
-                fetch(server + markovaction + "/" + this.state.data.id, {
-                    credentials: 'include',
-                    method: 'PATCH',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonRequest),
-                }).then((response) => {
-                    return response.json();
-                }).then((response) => {
-                    if (response.error) throw new Error("Something went wrong, please try again in a few minutes");
-                    else return response;
-                }).then((response) => {
-                }).catch((e) => {
-                    alert(e.message);
-                });
+                this.fetchOtherNextAction();
             }
-            // fetch next action
         }
     };
 
