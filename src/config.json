@@ -2,6 +2,11 @@
   "server" : "https://haxonomy-backend.herokuapp.com",
   "terms" : "/terms",
   "reports": "/reports",
-  "tree": "/tree"
+  "tree": "/tree",
+  "replies": "/replies",
+  "markovaction": "/markovActions",
+  "tool": "/tool",
+  "next": "/next",
+  "init": "/tool/init"
 }
 
