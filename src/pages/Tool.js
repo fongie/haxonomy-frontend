@@ -28,7 +28,7 @@ class Tool extends Component{
             data: null,
             numberOfActions: 0,
             actionStatus: unknown, // must be YES or NO before sending to backend
-            markovStateId: 1,
+            markovStateId: 41,
             reports: null,
         }
     }
@@ -264,7 +264,7 @@ class Tool extends Component{
             data: null,
             numberOfActions: 0,
             actionStatus: unknown, // must be YES or NO before sending to backend
-            markovStateId: 1,
+            markovStateId: 41,
         }, this.fetchNextAction())
     }
 
